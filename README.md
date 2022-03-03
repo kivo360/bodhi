@@ -50,4 +50,12 @@ The world doesn't need too many new absolutely discrete languages. Python is alr
 
 The upside to using an IR is that we can easily convert the dataflow system to other systems, and expand on those systems dynamically. For example, we can convert simple dataflow logic that doesn't rely on outside code to a SQL code. By using triggers we can reduce the amount of movement of teh data itself.
 
+## Roadmap
 
+- [ ] - Blog About Subject and Why I'm Doing It
+- [ ] - Include working examples of the system.
+- [ ] - Add client library with AST manipulations.
+- [ ] - Extemd JSON-based Server-side Compiler/Transpiler for more complex dataflows and workflows.
+- [ ] - Look into monitoring and data exploration.
+- [ ] - Display compilation targets
+- [ ] - Documentation. Lots of documentation!!!!!
