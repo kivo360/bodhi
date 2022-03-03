@@ -1,0 +1,4 @@
+FOR record in namespace
+    FILTER record.username == "${name}" AND record.stakeholder == "${stake}" AND record.project == "${project}" AND record.view_name == "${view}"
+    LIMIT 1
+    return record

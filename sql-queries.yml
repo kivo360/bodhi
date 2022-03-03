@@ -1,0 +1,16 @@
+language: python3-fastapi
+fprocess: /start.sh
+provider:
+  name: openfaas
+build_options:
+  - name: dev
+    packages: 
+      - make
+      - automake
+      - gcc
+      - g++
+      - subversion
+      - python3-dev
+      - musl-dev
+      - libffi-dev
+      - git

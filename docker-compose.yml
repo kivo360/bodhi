@@ -1,0 +1,92 @@
+version: "3"
+services:
+  
+  backend:
+    image: registry.gitlab.com/groma1/bodhi-app/monorepo:latest
+    build:
+      context: ./
+    ports:
+      - "7581:80"
+    depends_on:
+      - postgres-db
+      - arango-db
+    environment:
+      - PG_HOST=postgres_db
+      - ARANOGO_HOST=arango_db
+      - ALEMBIC_URI=postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:5432/${POSTGRES_DB}
+      # - ALEMBIC_URI=postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:5432/${POSTGRES_DB}
+    volumes:
+      - ./:/app
+    links:
+      - "postgres-db:postgres_db"
+      - "arango-db:arango_db"
+    command: /start-reload.sh
+    networks:
+      - bodhi-backend
+    env_file:
+    - .env
+  postgres-db:
+    image: postgres
+    restart: always
+    volumes:
+      # - "./initdb:/docker-entrypoint-initdb.d"
+      - pg-data-new:/var/lib/postgresql/data
+    environment:
+      - PG_PORT=5434
+      - POSTGRES_DB=${PG_DATABASE}
+      - POSTGRES_PASSWORD=${PG_PASSWORD}
+      - POSTGRES_USER=${PG_USER}
+      - DB_ANON_ROLE=${DB_ANON_ROLE}
+      - DB_SCHEMA=${DB_SCHEMA}
+    ports:
+      - 5434:5432
+    networks:
+      - bodhi-backend
+    env_file:
+    - .env
+  arango-db:
+    image: arangodb/arangodb
+    restart: always
+    volumes:
+      - arango-data:/var/lib/postgresql/data
+    ports:
+      - 8529:8529
+
+    environment:
+      - ARANGO_ROOT_PASSWORD=${ARANOGO_PASSWORD}
+    networks:
+      - bodhi-backend
+    env_file:
+    - dev.env
+  postgrest:
+    container_name: postgrest
+    image: postgrest/postgrest:latest
+    ports:
+      - "30005:3000"
+    environment:
+      # The standard connection URI format, documented at
+      # https://www.postgresql.org/docs/current/static/libpq-connect.html#LIBPQ-CONNSTRING
+      - PGRST_DB_URI=postgres://${PG_USER}:${PG_PASSWORD}@postgres-db:5432/${POSTGRES_DB}
+      # The name of which database schema to expose to REST clients
+      - PGRST_DB_SCHEMA=${DB_SCHEMA}
+      # The database role to use when no client authentication is provided
+      - PGRST_DB_ANON_ROLE=${DB_ANON_ROLE}
+    
+    depends_on:
+      - postgres-db
+      - arango-db
+    networks:
+      - bodhi-backend
+    restart: always
+    env_file:
+    - dev.env
+
+volumes:
+  pg-data-new:
+  arango-data:
+
+
+networks:
+  bodhi-backend:
+    driver: bridge
+
