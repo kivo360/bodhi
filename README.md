@@ -14,10 +14,9 @@ Bodhi Feature Store is a multi-part framework which compiles object oriented Pyt
 
 These dataflows get converted to different target systems, including SQL (materialized views and triggers), processing systems (such as AWS lambda, etc), and more. 
 
----
 
 ## Features
----
+
 - Analysis and transformation of Python classes to distributed stateful dataflows. These dataflows can be ported to cloud services and dataflow systems.
 - Due to the nature of dataflow systems, stateful entities cannot directly interact with each other. Therefore, direct calls to other objects, as done in object-oriented code, does not work in stateful dataflows. StateFlow splits such functions at the AST level to get rid of the remote call.
   Instead, StateFlow splits a function into several parts such that the dataflow system can move back and forth between the different stateful entities (e.g. dataflow operators).
