@@ -70,4 +70,4 @@ The upside to using an IR is that we can easily convert the dataflow system to o
 - https://github.com/JelleZijlstra/autotyping - A `LibCST` autotyping system. Learn how they analyze
 - [Pants Build Engine](https://github.com/pantsbuild/pants/tree/main/src/rust/engine). It's a source reference to a future workflow system. Note how they use different graphs to define task flows.
 - [Python AST Manipulation](https://github.com/leonardt/ast_tools)
-- [Spliff Workflow](https://spiffworkflow.readthedocs.io/en/latest/) - A workflow system for Python. Use as a sample source.
+- [Spliff Workflow](https://spiffworkflow.readthedocs.io/en/latest/) - A workflow system for Python. Use as a sample source. To learn more about the specific designs while creating circuit based transpilation, look at the the [workflow patterns system](http://www.workflowpatterns.com/patterns/data/workflow_structure.php).
