@@ -59,3 +59,14 @@ The upside to using an IR is that we can easily convert the dataflow system to o
 - [ ] - Look into monitoring and data exploration.
 - [ ] - Display compilation targets
 - [ ] - Documentation. Lots of documentation!!!!!
+
+
+
+
+
+### Interesting Links for Research
+
+- https://github.com/YaoApp/yao - Their UI system looks like a good starting for a data explorer.
+- https://github.com/JelleZijlstra/autotyping - A `LibCST` autotyping system. Learn how they analyze
+- [Pants Build Engine](https://github.com/pantsbuild/pants/tree/main/src/rust/engine). It's a source reference to a future workflow system. Note how they use different graphs to define task flows.
+- [Python AST Manipulation](https://github.com/leonardt/ast_tools)
