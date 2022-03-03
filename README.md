@@ -27,7 +27,7 @@ The full system is comprised of a client and a backend server. The backend serve
 The dataflow itself is stored inside of a graph database for easy review, manipulation, sharing, and accessing.
 
 ## Installation
----
+
 TBA ... These instructuions are sparse for the time being. Will update over time.
 
 
@@ -44,7 +44,7 @@ Here's the full system design of the Bodhi Feature Store.
 
 
 ## Why Not Write Another Programming Language?
----
+
 The world doesn't need too many new absolutely discrete languages. Python is already a very popular language, so is SQL. Prorcessing framework wise, we already have lambda and many other processing systems. What we need are ways to better manage the interopability of these systems without having to compromise by having to learn an entirely new language.
 
 The upside to using an IR is that we can easily convert the dataflow system to other systems, and expand on those systems dynamically. For example, we can convert simple dataflow logic that doesn't rely on outside code to a SQL code. By using triggers we can reduce the amount of movement of teh data itself.
