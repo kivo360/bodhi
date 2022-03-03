@@ -7,7 +7,7 @@
     </div>
 </div>
 
-<hr>
+<!-- <hr> -->
 
 Bodhi Feature Store is a multi-part framework which compiles object oriented Python code to distributed stateful dataflows and features you can manipulate within your database. 
 
