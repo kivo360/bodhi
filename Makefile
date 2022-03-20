@@ -2,7 +2,8 @@ build:
 	docker-compose build
 
 up-db:
-	docker-compose up -d db
+	docker-compose up -d postgres-db arango-db postgrest
+	
 
 build-dev:
 	docker-compose build

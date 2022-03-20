@@ -22,7 +22,7 @@ from pydantic import EmailStr
 from pydantic import Field
 from pydantic import validate_arguments
 
-from mangostar import commands as comms
+from mangostar import commands as commandss
 
 
 # from stringcase import snakecase
@@ -171,7 +171,7 @@ def test_insert_duplicate_schema(skybringer: Source):
     # saving_data = skybringer.dict(exclude={"tags", "bucket", "event_at"})
     # logger.error(skybringer.bucket)
     # logger.success(skybringer.dict())
-    comms.insert_dict(
+    commandss.insert_dict(
         bucket=skybringer.bucket,
         tags=skybringer.tags,
         data=skybringer.data,

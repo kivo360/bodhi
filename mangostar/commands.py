@@ -11,6 +11,8 @@ from sqlalchemy.sql.expression import false
 from stringcase import snakecase
 
 from mangostar import connection
+from mangostar import circular as circle
+
 from mangostar.circular import _init_tables
 from mangostar.circular import DBResponse
 from mangostar.convert import json_to_sql
@@ -18,7 +20,10 @@ from mangostar.graph_database.graph import ViewParams
 from mangostar.logic.maestro import NameMaestro
 from mangostar.settings import ModuleSettings
 from mangostar.tables import MetaTableAdapter
+from fastapi import HTTPException
 
+# A bunch of models for saving information
+from mangostar.models import Measurement, MeasureSet
 
 adapter: Optional[MetaTableAdapter] = None
 settings = ModuleSettings()
@@ -31,6 +36,10 @@ NAME_CONTROLLER: NameMaestro = NameMaestro()
 #         dict(sink=sys.stderr, serialize=True),
 #     ],
 # )
+
+
+def get_db():
+    return connection.relational
 
 
 def normalize_data(inputs: dict):
@@ -136,6 +145,7 @@ def ingest_data(
 ):
     # NOTE: This should most certainly not be global now that I think about it.
     # There are better options.
+    # TODO: Replace your damn values
     database = connection.relational
     norm_dict = normalize_data(data)
     try:
@@ -163,6 +173,21 @@ def create_materialized_view(
     *, data: dict, bucket: Optional[str] = None, indexing_tag: Optional[dict] = {}
 ):
     pass
+
+
+def measure_one(measure: Measurement):
+    pass
+
+
+def measure_many(measure_set: MeasureSet):
+    try:
+        db = get_db()
+        db.metrics.insert_many(measure_set.get_insertable())
+    except Exception as e:
+        logger.exception(e)
+        raise HTTPException(
+            status_code=500, detail="Unable to save the specific metrics"
+        )
 
 
 if __name__ == "__main__":

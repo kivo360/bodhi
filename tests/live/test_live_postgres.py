@@ -25,3 +25,4 @@ def test_send_insert():
         }
     }
     ingest_data(**ingestion_input)
+

@@ -13,7 +13,8 @@ services:
     environment:
       - PG_HOST=postgres_db
       - ARANOGO_HOST=arango_db
-      - ALEMBIC_URI=postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:5432/${POSTGRES_DB}
+      - PG_PORT=5432
+      - ALEMBIC_URI=postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:{PG_PORT}/${POSTGRES_DB}
       # - ALEMBIC_URI=postgresql://${PG_USER}:${PG_PASSWORD}@${PG_HOST}:5432/${POSTGRES_DB}
     volumes:
       - ./:/app
@@ -24,7 +25,7 @@ services:
     networks:
       - bodhi-backend
     env_file:
-    - .env
+    - container.env
   postgres-db:
     image: postgres
     restart: always
@@ -43,7 +44,7 @@ services:
     networks:
       - bodhi-backend
     env_file:
-    - .env
+    - container.env
   arango-db:
     image: arangodb/arangodb
     restart: always
@@ -57,7 +58,7 @@ services:
     networks:
       - bodhi-backend
     env_file:
-    - dev.env
+    - container.env
   postgrest:
     container_name: postgrest
     image: postgrest/postgrest:latest
@@ -79,7 +80,7 @@ services:
       - bodhi-backend
     restart: always
     env_file:
-    - dev.env
+    - container.env
 
 volumes:
   pg-data-new:
