@@ -49,7 +49,7 @@ def insert_item(item: InsertParameters):
 
 
 @app.post("/measure")
-def record_measurement(measure_set: models.MeasureSet, response: Response):
-    commands.measure_many(measure_set)
+def record_measurement(measurements: models.MeasureSet, response: Response):
+    commands.measure_many(measurements)
     response.status_code = 200
-    return measure_set
+    return measurements

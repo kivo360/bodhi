@@ -46,6 +46,8 @@ transitions = {extras = ["diagrams"], version = "^0.8.11"}
 alembic = "^1.7.6"
 uvicorn = "^0.17.6"
 typer = "^0.4.0"
+retworkx = "^0.11.0"
+matplotlib = "^3.5.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
