@@ -15,11 +15,12 @@ from mangostar import settings
 from mangostar.circular import DBResponse, _init_tables
 from mangostar.settings import ModuleSettings
 from mangostar.utils import InsertParameters
-
+from mangostar.service.routers import chat
 
 settings_root = ModuleSettings()
 
 app = FastAPI()
+app.include_router(chat.router, prefix="/chat", tags=["websocket", "broadcast"])
 
 
 @app.on_event("startup")
@@ -28,19 +29,6 @@ async def start_databases():
     table = circle.init()
     logger.error(settings_root.postgres_connection_str)
     logger.info(table)
-
-
-@app.get("/")
-def read_root():
-    sett = ModuleSettings()
-    debug(sett.arangoo)
-    debug(sett.postgres)
-    return {"Hello": "World"}
-
-
-@app.get("/items/{item_id}")
-def read_item(item_id: int, q: Optional[str] = None):
-    return {"item_id": item_id, "q": q}
 
 
 @app.post("/insert", response_model=DBResponse)

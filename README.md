@@ -7,6 +7,13 @@
     </div>
 </div>
 
+### Useful Pages
+
+| Name                                  | Description                                      |
+| ------------------------------------- | ------------------------------------------------ |
+| [Docs](https://fiteverything.us/docs) | All of the docs and design docs for the project. |
+
+
 <!-- <hr> -->
 
 Bodhi Feature Store is a multi-part framework which compiles object oriented Python code to distributed stateful dataflows and features you can manipulate within your database. 
