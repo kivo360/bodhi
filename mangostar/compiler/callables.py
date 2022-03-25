@@ -39,8 +39,8 @@ class Clock(ICallable):
 
 class Function(Stmt):
     name: Token
-    body: List[Expr] = field(default_factory=[])
-    params: List[Token] = field(default_factory=[])
+    body: List[Expr] = []
+    params: List[Token] = []
 
 
 @dataclass

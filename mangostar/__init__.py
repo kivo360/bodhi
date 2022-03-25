@@ -8,7 +8,8 @@ from pydantic import BaseModel
 from mangostar.settings import ModuleSettings
 
 from .adapters.connection_adapter import ConnectionAdapter
-from .core import FlexibleModel
+from .core import FlexibleModel, FlexibleModel as FlexModel, FlexibleModel as FModel
+
 from .main import Component
 from .main import Entity
 from .main import Subsystem
@@ -37,7 +38,7 @@ from .visitors import visit_json
 
 def orjson_dumps(v, *, default):
     # orjson.dumps returns bytes, to match standard json.dumps we need to decode
-    return orjson.dumps(v, default = default).decode()
+    return orjson.dumps(v, default=default).decode()
 
 
 # logger.disable("mangostar")

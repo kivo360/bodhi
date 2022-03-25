@@ -1,0 +1,47 @@
+{
+    "nodes": {
+        "binary": {
+            "+": "Add",
+            "-": "Subtract",
+            "*": "Multiply",
+            "/": "Divide",
+            "//": "FloorDivide",
+            "%": "Modulo",
+            "|": "BIT_OR",
+            "&": "BIT_AND",
+            "^": "BIT_XOR",
+            ">": "Greater",
+            ">=": "GreaterEq",
+            "<": "Less",
+            "<=": "LessEq",
+            "==": "Equals",
+            "!=": "NotEquals",
+            "and": "AND",
+            "or": "OR"
+        },
+        "unary": {
+            "+": "Plus",
+            "-": "Minus",
+            "!": "IsNot",
+            "not": "IsNotTxt"
+        },
+        "expression": {
+            "Program": "Program",
+            "Class": "Class",
+            "ExprStmt": "ExprStmt",
+            "Variable": "Variable",
+            "Assign": "Assign",
+            "Block": "Block",
+            "If": "If",
+            "While": "While",
+            "Call": "Call",
+            "Return": "Return",
+            "Logical": "Logical",
+            "Function": "Function",
+            "Expr": "Expr",
+            "For": "For",
+            "Break": "Break",
+            "Continue": "Continue"
+        }
+    }
+}
