@@ -13,10 +13,10 @@ from sqlalchemy import Numeric
 from sqlalchemy import String
 from sqlalchemy import Text
 
-from mangostar.matches import FieldType
-from mangostar.matches import MatchSQL
-from mangostar.matches import TableType
-from mangostar.utils import consistent_naming as const_name
+from bodhi_server.matches import FieldType
+from bodhi_server.matches import MatchSQL
+from bodhi_server.matches import TableType
+from bodhi_server.utils import consistent_naming as const_name
 
 
 def _generate_field(name: str, field_type: str):
@@ -26,8 +26,8 @@ def _generate_field(name: str, field_type: str):
         "attrs": {
             "node_type": "component",
             "sub_type": "field",
-            "field_type": field_type
-        }
+            "field_type": field_type,
+        },
     }
 
 
@@ -36,14 +36,15 @@ def generate_field(field_type: str):
     return _generate_field(uuid.uuid4().hex, field_type)
 
 
-def random_field_nodes(local_faker: Faker,
-                       record_number: int = 1) -> Generator[dict, None, None]:
+def random_field_nodes(
+    local_faker: Faker, record_number: int = 1
+) -> Generator[dict, None, None]:
 
     for _ in range(record_number):
         company_name = local_faker.company()
         yield _generate_field(
             const_name(company_name),
-            rand.choice(['number', 'string', 'integer', 'boolean'])
+            rand.choice(["number", "string", "integer", "boolean"]),
         )
 
 
@@ -56,19 +57,19 @@ def random_table_node(core_faker: Faker):
         "attrs": {
             "node_type": "entity",
             "sub_type": "tables",
-        }
+        },
     }
 
 
 class TestSqlMatchAndComposition:
     @pytest.mark.parametrize(
-        'field_type, expected',
+        "field_type, expected",
         [
             ("integer", Integer),
             ("string", Text),
             ("boolean", Boolean),
             ("number", Numeric),
-        ]
+        ],
     )
     def test_fields(self, generate_field, expected):
         sql_matcher = MatchSQL(generate_field)
@@ -84,14 +85,14 @@ class TestSqlMatchAndComposition:
             "attrs": {
                 "node_type": "entity",
                 "sub_type": "tables",
-            }
+            },
         }
         sql_matcher = MatchSQL(table_node)
         assert sql_matcher.is_sql
         node = sql_matcher.get_node()
         assert isinstance(node, TableType)
 
-    @pytest.mark.parametrize('record_number', [5, 10, 25])
+    @pytest.mark.parametrize("record_number", [5, 10, 25])
     def test_table_proper_size(
         self,
         record_number: int,
@@ -107,9 +108,7 @@ class TestSqlMatchAndComposition:
 
         table_plan: TableType = sql_matcher.node
 
-        for field_dict in random_field_nodes(
-            core_faker, record_number = record_number
-        ):
+        for field_dict in random_field_nodes(core_faker, record_number=record_number):
             field_matcher = MatchSQL(field_dict)
             assert field_matcher.is_sql
             field = field_matcher.node
@@ -117,7 +116,7 @@ class TestSqlMatchAndComposition:
 
         assert table_plan.field_count == record_number
 
-    @pytest.mark.parametrize('record_number', [5])
+    @pytest.mark.parametrize("record_number", [5])
     def test_call_sql_select_statement(
         self,
         record_number: int,
@@ -133,9 +132,7 @@ class TestSqlMatchAndComposition:
 
         table_plan: TableType = sql_matcher.node
 
-        for field_dict in random_field_nodes(
-            core_faker, record_number = record_number
-        ):
+        for field_dict in random_field_nodes(core_faker, record_number=record_number):
             field_matcher = MatchSQL(field_dict)
             assert field_matcher.is_sql
             field = field_matcher.node

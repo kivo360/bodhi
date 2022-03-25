@@ -3,34 +3,34 @@ from unittest.mock import patch
 
 import pytest
 
-from mangostar import match_sql
-from mangostar.matches import FieldType
-from mangostar.matches import TableType
-from mangostar.schema import TraversalManager
+from bodhi_server import match_sql
+from bodhi_server.matches import FieldType
+from bodhi_server.matches import TableType
+from bodhi_server.schema import TraversalManager
 
 
 @pytest.fixture
 def field_node():
     return {
-        'item_id': 'inside-0d5b80abb44c9568b39087f039ed1809',
-        'name': 'inside',
-        'attrs': {
-            'field_type': 'integer',
-            'node_type': 'component',
-            'sub_type': 'field'
-        }
+        "item_id": "inside-0d5b80abb44c9568b39087f039ed1809",
+        "name": "inside",
+        "attrs": {
+            "field_type": "integer",
+            "node_type": "component",
+            "sub_type": "field",
+        },
     }
 
 
 @pytest.fixture
 def table_node():
     return {
-        'item_id': 'inside-0d5b80abb44c9568b39087f039ed1809',
-        'name': 'services',
-        'attrs': {
-            'node_type': 'entity',
-            'sub_type': 'tables',
-        }
+        "item_id": "inside-0d5b80abb44c9568b39087f039ed1809",
+        "name": "services",
+        "attrs": {
+            "node_type": "entity",
+            "sub_type": "tables",
+        },
     }
 
 

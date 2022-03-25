@@ -8,7 +8,7 @@ from hypothesis import strategies as st
 from hypothesis.strategies import builds
 from hypothesis.strategies import composite
 
-from mangostar.utils import InsertParameters
+from bodhi_server.utils import InsertParameters
 
 
 fake_generator = Faker()

@@ -4,7 +4,7 @@ import random as rand
 import uuid
 from loguru import logger
 
-from mangostar import circular as circle, models, utils, connection
+from bodhi_server import circular as circle, models, utils, connection
 
 
 def save_metric():

@@ -1,6 +1,6 @@
 import os
 
-from mangostar.settings import NamespaceSettings
+from bodhi_server.settings import NamespaceSettings
 
 
 def test_namespace_envs_correct():

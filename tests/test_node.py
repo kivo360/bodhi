@@ -3,10 +3,10 @@ from typing import List
 
 from loguru import logger
 
-from mangostar import Component
-from mangostar import Entity
-from mangostar import Subsystem
-from mangostar import System
+from bodhi_server import Component
+from bodhi_server import Entity
+from bodhi_server import Subsystem
+from bodhi_server import System
 
 MD5_REG = r"([a-fA-F\d]{32})"
 
@@ -23,7 +23,7 @@ def test_node_id():
     # This is how a table is technically configured internally. Therefore we're going to label it like this.
     # In next steps, nodes will also have something stating the first node it belongs to.
     # This will be the case until we can put it into a graph database (fingers crossed)
-    test_entity = Entity("table", name = "test_table_name")
+    test_entity = Entity("table", name="test_table_name")
     n_id: str = test_entity.node_id
     separated = split_node_id(n_id)
 
@@ -33,14 +33,14 @@ def test_node_id():
 
 
 def test_add_entity(dynamic_system: System):
-    table = Entity("table", name = "test_table_name")
+    table = Entity("table", name="test_table_name")
     # Adding to the tests' system
     table.add_current(dynamic_system)
     assert dynamic_system.node_count > 0
 
 
 def test_add_component_to_entity(dynamic_system: System):
-    table = Entity("table", name = "test_table_name")
+    table = Entity("table", name="test_table_name")
     table.system = dynamic_system
     # Adding to the tests' system
     table_attr = Component("field", "test_field_name")
