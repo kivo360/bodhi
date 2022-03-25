@@ -14,16 +14,22 @@ class TokenType(str, Enum):
     SEMICOLON = ("SEMICOLON",)
     SLASH = ("SLASH",)
     STAR = ("STAR",)
+    DOUBLESTAR = ("DOUBLESTAR",)
+    DOUBLESLASH = ("DOUBLESLASH",)
 
     # One or two character tokens.
     BANG = ("BANG",)
     BANG_EQUAL = ("BANG_EQUAL",)
     EQUAL = ("EQUAL",)
+    NOT_EQUAL = ("NOT_EQUAL",)
     EQUAL_EQUAL = ("EQUAL_EQUAL",)
     GREATER = ("GREATER",)
     GREATER_EQUAL = ("GREATER_EQUAL",)
     LESS = ("LESS",)
     LESS_EQUAL = ("LESS_EQUAL",)
+    IS_IN = ("IS_IN",)
+    NOT_IN = ("NOT_IN",)
+    IS = ("IS",)
 
     # Literals.
     IDENTIFIER = ("IDENTIFIER",)

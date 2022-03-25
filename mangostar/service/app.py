@@ -12,7 +12,7 @@ from pydantic import root_validator
 from mangostar import commands, models
 from mangostar import circular as circle
 from mangostar import settings
-from mangostar.circular import DBResponse, _init_tables
+from mangostar.circular import DBResponse
 from mangostar.settings import ModuleSettings
 from mangostar.utils import InsertParameters
 from mangostar.service.routers import chat

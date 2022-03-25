@@ -2,7 +2,7 @@ import hashlib
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Dict, Iterable, Optional
+from typing import Any, Callable, Dict, Iterable, Optional, Tuple, TypeVar, Union
 
 from inflection import parameterize
 from inflection import tableize
@@ -14,13 +14,15 @@ import networkx as nx
 from addict import Addict as DDict
 from auto_all import end_all
 from auto_all import start_all
-from cytoolz import curry
+from toolz import curry
 from mako.lookup import TemplateLookup
 from pydantic import BaseModel
 from pydantic import root_validator
 from pydantic import validate_arguments
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.sql import ClauseElement
+
+_T = TypeVar("_T")
 
 
 FOLDER_PATH = Path(__file__).parent
@@ -164,6 +166,20 @@ class InsertParameters(BaseModel):
 
         doti.bucket = str(nested_bucket)
         return doti.to_dict()
+
+
+def create_token():
+    pass
+
+
+def __dataclass_transform__(
+    *,
+    eq_default: bool = True,
+    order_default: bool = False,
+    kw_only_default: bool = False,
+    field_descriptors: Tuple[Union[type, Callable[..., Any]], ...] = (()),
+) -> Callable[[_T], _T]:
+    return lambda a: a
 
 
 end_all(globals())
