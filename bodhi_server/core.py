@@ -26,7 +26,7 @@ class ParameterMetaclass(ModelMetaclass):
     pass
 
 
-class FlexibleModel(BaseModel, metaclass=ParameterMetaclass):
+class FlexibleModel(BaseModel):
     class Config:
         extra = "allow"
         arbitrary_types_allowed = "allow"
