@@ -21,7 +21,7 @@ from .utils import __dataclass_transform__
 #     return lambda a: a
 
 
-@__dataclass_transform__(kw_only_default=False, field_descriptors=(Field, FieldInfo))
+@__dataclass_transform__(kw_only_default=True, field_descriptors=(Field, FieldInfo))
 class ParameterMetaclass(ModelMetaclass):
     pass
 

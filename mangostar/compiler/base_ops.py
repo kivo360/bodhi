@@ -35,7 +35,7 @@ class Binary(Expr):
 
 
 class Grouping(Expr):
-    expression: Expr
+    expr: Expr
 
 
 class Literal(Expr):
@@ -65,7 +65,7 @@ if __name__ == "__main__":
             token=Token(token_type=TokenType.MINUS, lexeme="-", literal=None, line=1),
         ),
         token=Token(token_type=TokenType.STAR, lexeme="*", literal=None, line=1),
-        left=Grouping(expression=Literal(value=45.67)),
+        left=Grouping(expr=Literal(value=45.67)),
     )
 
     print(test_binary)

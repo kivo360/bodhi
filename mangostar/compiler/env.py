@@ -43,3 +43,5 @@ class Environment(BaseModel):
 
     def assign_at(self, distance: int, name: Token, value: Any) -> None:
         self.ancestor(distance).values[name.lexeme] = value
+
+)

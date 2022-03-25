@@ -3,13 +3,16 @@ from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
 from typing import Any, Callable, Dict, Iterable, Optional, Tuple, TypeVar, Union
+import uuid
 
 from inflection import parameterize
 from inflection import tableize
 from inflection import titleize
-from inflection import underscore
+from inflection import underscore, camelize
 
 import addict
+from loguru import logger
+from matplotlib.pyplot import title
 import networkx as nx
 from addict import Addict as DDict
 from auto_all import end_all
@@ -21,6 +24,7 @@ from pydantic import root_validator
 from pydantic import validate_arguments
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.sql import ClauseElement
+from retworkx.visualization import graphviz_draw
 
 _T = TypeVar("_T")
 
@@ -53,6 +57,10 @@ class DynamicGlobalMap(addict.Dict):
 
 def consistent_naming(name: str) -> str:
     return underscore((parameterize(name)))
+
+
+def consistent_classes(name: str) -> str:
+    return camelize(underscore(name))
 
 
 def consistent_table(name: str) -> str:
@@ -99,7 +107,7 @@ def in_set(posts: Iterable[Any], item: Any) -> bool:
 
 @lru_cache
 def make_cache(node_json: str):
-    return hashlib.md5(node_json).hexdigest()
+    return hashlib.md5(node_json).hexdigest()  # type: ignore
 
 
 # ----------------------------------------------------------------
@@ -168,6 +176,10 @@ class InsertParameters(BaseModel):
         return doti.to_dict()
 
 
+def hexid() -> str:
+    return uuid.uuid4().hex[:5]
+
+
 def create_token():
     pass
 
@@ -180,6 +192,28 @@ def __dataclass_transform__(
     field_descriptors: Tuple[Union[type, Callable[..., Any]], ...] = (()),
 ) -> Callable[[_T], _T]:
     return lambda a: a
+
+
+def graphviz_show(
+    graph,
+    node_attr_fn=None,
+    edge_attr_fn=None,
+    graph_attr=None,
+    filename: Optional[str] = None,
+    image_type=None,
+    method=None,
+):
+    drawing = graphviz_draw(
+        graph, node_attr_fn, edge_attr_fn, graph_attr, method=method
+    )
+
+    if drawing is None:
+        logger.info(
+            "There was some error with drawing the graph. Empty response returned."
+        )
+
+        return
+    drawing.show(title=(filename.split(".")[0] if filename else "A Graph Image"))
 
 
 end_all(globals())

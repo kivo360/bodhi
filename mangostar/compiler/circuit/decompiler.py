@@ -18,6 +18,7 @@ from mangostar.compiler import (
     Visitor,
 )
 from pydantic import Field
+from mangostar import FMo
 from mangostar.compiler.callables import *
 from mangostar.compiler import ICallable
 from mangostar.compiler.env import Environment
@@ -27,10 +28,21 @@ CWD_DIR = Path.cwd()
 
 
 @dataclass
-class __Interpreter(Visitor):
+class __Interpreter(FModel, Visitor):  # type: ignore
     environment: Optional[Environment] = None
     globals: Environment = Environment()
     locals: Dict[Expr, int] = {}  # type: ignore
+
+    @property
+    def env(self):
+        """The env property."""
+        if self.environment is None:
+            raise AttributeError("Environment is not defined.")
+        return self.environment
+
+    @env.setter
+    def env(self, value: Environment):
+        self._env = Environment
 
     def resolve(self, expr: Expr, depth: int):
         self.locals[expr] = depth
@@ -39,8 +51,8 @@ class __Interpreter(Visitor):
     def look_up_variable(self, name: Token, expr: Expr):
         distance = self.locals.get(expr, None)
         if distance is not None:
-            return self.environment.get_at(distance, name.lexeme)
-        return self.globals.get(name)
+            return self.env.get_at(distance, name.lexeme)
+        return self.globals.access(name)
 
     def __post_init__(self):
         self.globals.define("clock", Clock())
@@ -89,7 +101,7 @@ class __Interpreter(__Interpreter):
             raise TypeError("One of the two evaluated expressions is off.")
 
     def visit_unary(self, node: "Unary"):
-        right = self.evaluate(node.right)
+        right = self.evaluate(node.expr)
         exp_types = {
             TokenType.MINUS: lambda x: (-1 * x),
             TokenType.BANG: lambda x: (not self.is_truthy(x)),
@@ -131,7 +143,7 @@ class Interpreter(__Interpreter):
         if stmt.initializer is not None:
             value = self.evaluate(stmt.initializer)
 
-        self.environment.define(stmt.name, value)
+        self.env.define(stmt.name.lexeme, value)
 
     def visit_variable_expr(self, expr: Variable) -> Any:
         return self.environment.get(expr.name)
@@ -140,7 +152,7 @@ class Interpreter(__Interpreter):
         value = self.evaluate(expr.value)
         distance = self.locals.get(expr, None)
         if distance:
-            self.environment.assign_at(distance, expr.name, value)
+            self.env.assign_at(distance, expr.name, value)
         else:
             self.globals.assign(expr.name, value)
 

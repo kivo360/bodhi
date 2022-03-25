@@ -1,4 +1,7 @@
 from enum import Enum
+from auto_all import start_all, end_all
+
+start_all(globals())
 
 
 class TokenType(str, Enum):
@@ -40,10 +43,10 @@ class TokenType(str, Enum):
     AND = ("AND",)
     CLASS = ("CLASS",)
     ELSE = ("ELSE",)
+    IF = ("IF",)
     FALSE = ("FALSE",)
     FUN = ("FUN",)
     FOR = ("FOR",)
-    IF = ("IF",)
     NIL = ("NIL",)
     OR = ("OR",)
     PRINT = ("PRINT",)
@@ -55,3 +58,82 @@ class TokenType(str, Enum):
     WHILE = ("WHILE",)
 
     EOF = "EOF"
+
+
+class EdgeTypes(str, Enum):
+    ELSE = ("ELSE",)
+    IF = ("IF",)
+    BODY = ("BODY",)
+    BRANCH_FALSE = ("BRANCH_FALSE",)
+    BRANCH_TRUE = ("BRANCH_TRUE",)
+    LEFT = ("EXPR_LEFT",)
+    RIGHT = ("EXPR_RIGHT",)
+    EXPR = ("EXPR",)
+
+
+class OpType(str, Enum):
+    NONE = ("NONE",)
+    ASSIGNMENT = ("ASSIGNMENT",)
+    OR = ("OR",)
+    AND = ("AND",)
+    EQUALITY = ("EQUALITY",)
+    COMPARISON = ("COMPARISON",)
+    TERM = ("TERM",)
+    FACTOR = ("FACTOR",)
+    UNARY = ("UNARY",)
+    CALL = ("CALL",)
+    PRIMARY = ("PRIMARY",)
+
+
+class UnaryType(str, Enum):
+    NOT = ("NOT",)
+    MINUS = ("MINUS",)
+    PLUS = ("PLUS",)
+
+
+class BinopType(str, Enum):
+    ADD = "ADD"
+    SUB = "SUB"
+    MUL = "MUL"
+    DIV = "DIV"
+    FLOORDIV = "FLOORDIV"
+    MOD = "MOD"
+    BIT_OR = "BIT_OR"
+    BIT_AND = "BIT_AND"
+    BIT_XOR = "BIT_XOR"
+    BIT_LSHIFT = "BIT_LSHIFT"
+    BIT_RSHIFT = "BIT_RSHIFT"
+    LT = "LT"
+    LE = "LE"
+    GT = "GT"
+    GE = "GE"
+    EQ = "EQ"
+    NE = "NE"
+    IN = "IN"
+    NOT_IN = "NOT_IN"
+    IS = "IS"
+    IS_NOT = "IS_NOT"
+    AND = "AND"
+    OR = "OR"
+
+
+class NodeType(str, Enum):
+    PROGRAM = "PROGRAM"
+    EXPRSTMT = "EXPRSTMT"
+    VARIABLE = "VARIABLE"
+    ASSIGN = "ASSIGN"
+    BLOCK = "BLOCK"
+    IF = "IF"
+    WHILE = "WHILE"
+    CALL = "CALL"
+    RETURN = "RETURN"
+    LOGICAL = "LOGICAL"
+    FUNCTION = "FUNCTION"
+    CLASS = "CLASS"
+    EXPR = "EXPR"
+    FOR = "FOR"
+    BREAK = "BREAK"
+    CONTINUE = "CONTINUE"
+
+
+end_all(globals())

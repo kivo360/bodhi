@@ -4,7 +4,7 @@ from ast import Dict
 from dataclasses import field
 from datetime import datetime
 from pathlib import Path
-from typing import Any, List
+from typing import Any, List, Optional
 
 from auto_all import end_all, start_all
 from pydantic import Field
@@ -23,6 +23,64 @@ from mangostar.compiler import (
 CWD_DIR = Path.cwd()
 
 start_all(globals())
+
+
+class ExprVisitor(abc.ABC):
+    @abc.abstractmethod
+    def visit_binary(self, expr: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_unary(self, node: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_grouping(self, expr: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_literal(self, expr: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_expression_stmt(self, stmt: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_variable_expr(self, expr: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_assign_expr(self, expr: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_block_stmt(self, stmt: Stmt):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_if_stmt(self, stmt: Stmt):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_logical_expr(self, expr: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_while_stmt(self, stmt: Stmt):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_call_expr(self, expr: Expr):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_function_stmt(self, stmt: Stmt):
+        raise NotImplementedError
+
+    @abc.abstractmethod
+    def visit_return_stmt(self, stmt: Stmt):
+        raise NotImplementedError
 
 
 class ExprStmt(Stmt):
@@ -59,7 +117,7 @@ class Assign(Stmt):
 
 
 class Block(Stmt):
-    stmts: List[Stmt] = Field([])
+    stmts: List[Stmt] = []
 
 
 class If(Stmt):
@@ -71,6 +129,13 @@ class If(Stmt):
 class While(Stmt):
     condition: Expr
     body: Stmt
+
+
+class For(Stmt):
+    target: Expr
+    iter: Expr
+    body: Stmt
+    orelse: Optional[Stmt] = None
 
 
 class Call(Stmt):
@@ -90,27 +155,78 @@ class Logical(Expr):
     token: Token
 
 
+class Function(Stmt):
+    name: Token
+    body: List[Expr] = []
+    params: List[Token] = []
+
+
 class ReturnErr(RuntimeError):
     def __init__(self, value: Any, *args: object) -> None:
         super().__init__(*args)
         self.value = value
 
 
+def expr_stmt(expr: Expr) -> ExprStmt:
+    return ExprStmt(expr=expr)
+
+
+def print_stmt(expr: Expr) -> Print:
+    return Print(expr=expr)
+
+
+def var(name: Token, initial: Expr) -> Var:
+    return Var(name=name, initializer=initial)
+
+
+def variable(name: Token) -> Variable:
+    return Variable(name=name)
+
+
+def assign(name: Token, val: Expr) -> Assign:
+    return Assign(name=name, value=val)
+
+
+def block(stmts: List[Stmt]) -> Block:
+    return Block(stmts=stmts)
+
+
+def if_stmt(cond: Expr, then: Stmt, else_: Stmt) -> If:
+    return If(condition=cond, then_branch=then, else_branch=else_)
+
+
+def while_stmt(cond: Expr, body: Stmt) -> While:
+    return While(condition=cond, body=body)
+
+
+def for_stmt(target: Expr, iter: Expr, body: Stmt, orelse: Optional[Stmt]) -> For:
+    return For(target=target, iter=iter, body=body, orelse=orelse)
+
+
+def call_stmt(callee: Expr, paren: Token, arguments: List[Expr]) -> Call:
+    return Call(callee=callee, paren=paren, arguments=arguments)
+
+
+def return_stmt(kwd: Token, value: Expr) -> Return:
+    return Return(keyword=kwd, value=value)
+
+
+def fn_stmt(name: Token, body: List[Expr], params: List[Token]) -> Function:
+    return Function(name=name, body=body, params=params)
+
+
 end_all(globals())
 
 
 #
-# class Callable(Stmt):
-#     callee: Expr
-#     paren: Token
-#     arguments: Expr
 
 
 if __name__ == "__main__":
-    test_binary = Binary(
-        right=Unary(Literal(123), token=Token(TokenType.MINUS, "-", None, 1)),
-        token=Token(TokenType.STAR, "*", None, 1),
-        left=Grouping(Literal(45.67)),
-    )
-
-    print(test_binary)
+    pass
+    # test_binary = Binary(
+    # right=Unary(Literal(123), token=Token(TokenType.MINUS, "-", None, 1)),
+    # token=Token(TokenType.STAR, "*", None, 1),
+    # left=Grouping(Literal(45.67)),
+    # )
+#
+# print(test_binary)
