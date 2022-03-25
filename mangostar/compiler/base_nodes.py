@@ -1,8 +1,8 @@
 import abc
-from typing import Any, AnyStr
+from typing import Any, AnyStr, Optional
 
 from mangostar import FlexibleModel as FlexModel
-from .types import TokenType
+from mangostar.compiler.types import TokenType
 from inflection import underscore
 from loguru import logger
 
@@ -50,8 +50,8 @@ class Visitor(abc.ABC):
 class Token(Node):
     token_type: TokenType
     lexeme: str
-    literal: Any
-    line: int
+    literal: Optional[Any] = None
+    line: Optional[int] = None
 
     def __str__(self) -> str:
         return f"Token(type={self.token_type}, lexeme={self.lexeme}, literal={self.literal})"
