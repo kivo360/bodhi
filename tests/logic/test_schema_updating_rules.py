@@ -5,12 +5,12 @@ from devtools import debug
 
 from faker import Faker
 
-from mangostar import connection
-from mangostar.graph_database.utilz import gen_hex_id
-from mangostar.graph_database.utilz import is_json_schema
-from mangostar.logic.interfaces import NamespaceResponse
-from mangostar.logic.maestro import NameMaestro
-from mangostar.settings import ModuleSettings
+from bodhi_server import connection
+from bodhi_server.graph_database.utilz import gen_hex_id
+from bodhi_server.graph_database.utilz import is_json_schema
+from bodhi_server.logic.interfaces import NamespaceResponse
+from bodhi_server.logic.maestro import NameMaestro
+from bodhi_server.settings import ModuleSettings
 
 
 modset = ModuleSettings()
@@ -58,8 +58,8 @@ class TestSchemaManagement:
         assert not resp.is_prior
         assert not resp.is_schema
 
-    @patch("mangostar.logic.maestro.NameMaestro.create_view")
-    @patch("mangostar.logic.maestro.NameMaestro.add_schema")
+    @patch("bodhi_server.logic.maestro.NameMaestro.create_view")
+    @patch("bodhi_server.logic.maestro.NameMaestro.add_schema")
     def test_updae_schema_not_prior(self, schema_mock: MagicMock, view_mock: MagicMock):
         profile: dict = create_profile()
         default_response = NamespaceResponse()
@@ -67,9 +67,9 @@ class TestSchemaManagement:
         schema_mock.assert_called_once_with(item=profile, ns_resp=default_response)
         view_mock.assert_called_once_with(default_response)
 
-    @patch("mangostar.logic.maestro.NameMaestro.merge_schema")
-    @patch("mangostar.logic.maestro.NameMaestro.create_view")
-    @patch("mangostar.logic.maestro.NameMaestro.add_schema")
+    @patch("bodhi_server.logic.maestro.NameMaestro.merge_schema")
+    @patch("bodhi_server.logic.maestro.NameMaestro.create_view")
+    @patch("bodhi_server.logic.maestro.NameMaestro.add_schema")
     # create_view
     def test_update_schema_is_schema(
         self,

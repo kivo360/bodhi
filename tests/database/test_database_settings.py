@@ -1,4 +1,4 @@
-from mangostar import ModuleSettings
+from bodhi_server import ModuleSettings
 
 
 def test_password_exist():
@@ -8,4 +8,4 @@ def test_password_exist():
 
 def test_username_is_starboy():
     local_settings = ModuleSettings()
-    assert local_settings.postgres.user == 'starboy'
+    assert local_settings.postgres.user == "starboy"

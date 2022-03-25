@@ -4,16 +4,16 @@ import pytest
 from sqlalchemy import create_engine
 from sqlalchemy import MetaData
 
-from mangostar import connection
-from mangostar.tables import MetaTableAdapter
-from mangostar.tables import select
-from mangostar.utils import execute
+from bodhi_server import connection
+from bodhi_server.tables import MetaTableAdapter
+from bodhi_server.tables import select
+from bodhi_server.utils import execute
 
 
 class TestTimeCrudOperations:
     def setup_class(cls):
         engine = create_engine(connection.settings.postgres_connection_str)
-        metadata = MetaData(bind = engine)
+        metadata = MetaData(bind=engine)
         cls.adapter = MetaTableAdapter(metadata)
         # Create table
         cls.metadata = metadata
@@ -27,17 +27,17 @@ class TestTimeCrudOperations:
     @pytest.mark.skip("Skipping this test. Depreciated.")
     def test_insert_json_record(self):
         # print("hello_world")
-        ex = execute(engine = self.engine)
+        ex = execute(engine=self.engine)
         self.kernel.insert_into(
-            is_execute = True,
-            bucket = "token",
-            data = {"key": "value_pair"},
+            is_execute=True,
+            bucket="token",
+            data={"key": "value_pair"},
         )
         (
             ex(
                 self.kernel.insert_into(
-                    bucket = "token",
-                    data = {"key": "value_pair"},
+                    bucket="token",
+                    data={"key": "value_pair"},
                 )
             )
         )

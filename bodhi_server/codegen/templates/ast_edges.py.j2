@@ -1,0 +1,59 @@
+from typing import Any, Optional
+
+from bodhi_server.compiler import (
+    OpType,
+    BinopType,
+    UnaryType,
+)
+from bodhi_server.compiler.circuit.core import ASTNode
+
+
+__op_map = {
+    "+": BinopType,
+    "-": BinopType.SUB,
+    "*": BinopType.MUL,
+    "/": BinopType.DIV,
+    "//": BinopType.FLOORDIV,
+    "%": BinopType.MOD,
+    "|": BinopType.BIT_OR,
+    "&": BinopType.BIT_AND,
+    "^": BinopType.BIT_XOR,
+    "^": BinopType.BIT_XOR,
+    ">": BinopType.GT,
+    ">=": BinopType.GE,
+    "<": BinopType.LT,
+    "<=": BinopType.LE,
+    "==": BinopType.EQ,
+    "!=": BinopType.NE,
+    "and": OpType.AND,
+    "or": OpType.OR,
+}
+
+
+__unary_op_map = {
+    "+": UnaryType.PLUS,
+    "-": UnaryType.MINUS,
+    "!": UnaryType.NOT,
+    "not": UnaryType.NOT,
+}
+
+
+class Explicit(ASTNode):
+    value: Optional[Any] = None
+
+
+class Group(ASTNode):
+    """Suggest that the function is written in a parenthesis."""
+
+
+class Binary(ASTNode):
+    """Binary operator."""
+
+
+class Unary(ASTNode):
+    pass
+
+
+def get_unary(op: str) -> UnaryType:
+    """Get the unary operator type."""
+    return __unary_op_map[op]

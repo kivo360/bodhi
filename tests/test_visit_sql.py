@@ -9,13 +9,13 @@ from loguru import logger
 import more_itertools as mtoolz
 import pytest
 
-from mangostar import SQLVisitor
-from mangostar import System
+from bodhi_server import SQLVisitor
+from bodhi_server import System
 
 # logger.disable(__file__)
 
 
-@pytest.mark.parametrize('field_nums', [2, 3])
+@pytest.mark.parametrize("field_nums", [2, 3])
 def test_vistor_has_started(flat_table: System):
     sql_visitor = SQLVisitor(flat_table)
     assert not sql_visitor.has_started
@@ -25,7 +25,7 @@ def test_vistor_has_started(flat_table: System):
     assert sql_visitor.has_started
 
 
-@pytest.mark.parametrize('field_nums', [2, 3, 10])
+@pytest.mark.parametrize("field_nums", [2, 3, 10])
 def test_get_root_node(flat_table: System):
     sql_visitor = SQLVisitor(flat_table)
     nodes: Dict[str, List[str]] = sql_visitor.current_nodes
@@ -33,7 +33,7 @@ def test_get_root_node(flat_table: System):
     assert len(nodes) > 0
 
 
-@pytest.mark.parametrize('field_nums', [2, 3])
+@pytest.mark.parametrize("field_nums", [2, 3])
 def test_get_table_fields(flat_table: System, field_nums: int):
 
     visitor = SQLVisitor(flat_table)
@@ -48,7 +48,7 @@ def test_get_table_fields(flat_table: System, field_nums: int):
     assert not visitor.has_children
 
 
-@pytest.mark.parametrize('field_nums', [2, 3, 5])
+@pytest.mark.parametrize("field_nums", [2, 3, 5])
 def test_nested_table(nested_table: System, field_nums: int):
 
     visitor = SQLVisitor(nested_table)

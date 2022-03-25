@@ -17,7 +17,8 @@ fileConfig(config.config_file_name)
 # for 'autogenerate' support
 # from myapp import mymodel
 # target_metadata = mymodel.Base.metadata
-from mangostar.pytables import imports
+from bodhi_server.pytables import imports
+
 target_metadata = imports.metadata
 
 # other values from the config, defined by the needs of env.py,
@@ -39,7 +40,7 @@ def run_migrations_offline():
 
     """
     possible_uri = os.getenv("ALEMBIC_URI", None)
-    url = (possible_uri if possible_uri else config.get_main_option("sqlalchemy.url"))
+    url = possible_uri if possible_uri else config.get_main_option("sqlalchemy.url")
     context.configure(
         url=url,
         target_metadata=target_metadata,
@@ -60,16 +61,18 @@ def run_migrations_online():
     """
     possible_uri = os.getenv("ALEMBIC_URI", None)
 
-    connectable = (create_engine(possible_uri) if possible_uri else engine_from_config(
-        config.get_section(config.config_ini_section),
-        prefix="sqlalchemy.",
-        poolclass=pool.NullPool,
-    )) 
+    connectable = (
+        create_engine(possible_uri)
+        if possible_uri
+        else engine_from_config(
+            config.get_section(config.config_ini_section),
+            prefix="sqlalchemy.",
+            poolclass=pool.NullPool,
+        )
+    )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

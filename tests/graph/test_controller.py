@@ -6,11 +6,11 @@ from devtools import debug
 from arango.graph import Graph
 from faker import Faker
 
-from mangostar.graph_database._controller import GraphController
-from mangostar.graph_database.graph import Edge
-from mangostar.graph_database.graph import EdgeQuery
-from mangostar.graph_database.graph import Node
-from mangostar.utils import *
+from bodhi_server.graph_database._controller import GraphController
+from bodhi_server.graph_database.graph import Edge
+from bodhi_server.graph_database.graph import EdgeQuery
+from bodhi_server.graph_database.graph import Node
+from bodhi_server.utils import *
 
 
 GRAPH_NAME = "testing_graph"

@@ -6,15 +6,15 @@ from loguru import logger
 from faker import Faker
 from pytest import fixture
 
-from mangostar import Field
-from mangostar import Subsystem
-from mangostar import System
-from mangostar import system
-from mangostar import Table
+from bodhi_server import Field
+from bodhi_server import Subsystem
+from bodhi_server import System
+from bodhi_server import system
+from bodhi_server import Table
 
 fake = Faker()
 
-FIELD_TYPES = ['integer', 'boolean', 'number', 'string']
+FIELD_TYPES = ["integer", "boolean", "number", "string"]
 
 
 def get_field() -> Field:
@@ -34,12 +34,12 @@ def _flat_table(field_nums: int, dynamic_system: System) -> Table:
 
 
 @fixture
-def dynamic_system() -> 'System':
+def dynamic_system() -> "System":
     return system(uuid4().hex)
 
 
 @fixture
-def flat_table(field_nums: int, dynamic_system: 'System'):
+def flat_table(field_nums: int, dynamic_system: "System"):
     """Create a flat table from field number of fields .
 
     Args:
@@ -54,7 +54,7 @@ def flat_table(field_nums: int, dynamic_system: 'System'):
 
 
 @fixture
-def nested_table(field_nums: int, dynamic_system: 'System'):
+def nested_table(field_nums: int, dynamic_system: "System"):
     """Generate a table for a table .
 
     Args:
@@ -72,284 +72,158 @@ def nested_table(field_nums: int, dynamic_system: 'System'):
     return dynamic_system
 
 
-@fixture(scope = "session")
+@fixture(scope="session")
 def nested_jsonschema():
     local_schema = {
-        '$schema':
-        'http://json-schema.org/schema#',
-        'type':
-        'object',
-        'properties': {
-            'tierBased': {
-                'type': 'boolean'
-            },
-            'taker': {
-                'type': 'number'
-            },
-            'maker': {
-                'type': 'number'
-            },
-            'precision': {
-                'type': 'object',
-                'properties': {
-                    'base': {
-                        'type': 'integer'
-                    },
-                    'quote': {
-                        'type': 'integer'
-                    },
-                    'amount': {
-                        'type': 'integer'
-                    },
-                    'price': {
-                        'type': 'integer'
-                    }
+        "$schema": "http://json-schema.org/schema#",
+        "type": "object",
+        "properties": {
+            "tierBased": {"type": "boolean"},
+            "taker": {"type": "number"},
+            "maker": {"type": "number"},
+            "precision": {
+                "type": "object",
+                "properties": {
+                    "base": {"type": "integer"},
+                    "quote": {"type": "integer"},
+                    "amount": {"type": "integer"},
+                    "price": {"type": "integer"},
                 },
-                'required': ['amount', 'base', 'price', 'quote']
+                "required": ["amount", "base", "price", "quote"],
             },
-            'limits': {
-                'type': 'object',
-                'properties': {
-                    'amount': {
-                        'type': 'object',
-                        'properties': {
-                            'min': {
-                                'type': 'number'
-                            },
-                            'max': {
-                                'type': 'number'
-                            }
+            "limits": {
+                "type": "object",
+                "properties": {
+                    "amount": {
+                        "type": "object",
+                        "properties": {
+                            "min": {"type": "number"},
+                            "max": {"type": "number"},
                         },
-                        'required': ['max', 'min']
+                        "required": ["max", "min"],
                     },
-                    'price': {
-                        'type': 'object',
-                        'properties': {
-                            'min': {
-                                'type': 'number'
-                            },
-                            'max': {
-                                'type': 'number'
-                            }
+                    "price": {
+                        "type": "object",
+                        "properties": {
+                            "min": {"type": "number"},
+                            "max": {"type": "number"},
                         },
-                        'required': ['max', 'min']
+                        "required": ["max", "min"],
                     },
-                    'cost': {
-                        'type': 'object',
-                        'properties': {
-                            'min': {
-                                'type': 'number'
-                            }, 'max': {
-                                'type': 'null'
-                            }
+                    "cost": {
+                        "type": "object",
+                        "properties": {
+                            "min": {"type": "number"},
+                            "max": {"type": "null"},
                         },
-                        'required': ['max', 'min']
+                        "required": ["max", "min"],
                     },
-                    'market': {
-                        'type': 'object',
-                        'properties': {
-                            'min': {
-                                'type': 'number'
-                            },
-                            'max': {
-                                'type': 'number'
-                            }
+                    "market": {
+                        "type": "object",
+                        "properties": {
+                            "min": {"type": "number"},
+                            "max": {"type": "number"},
                         },
-                        'required': ['max', 'min']
-                    }
+                        "required": ["max", "min"],
+                    },
                 },
-                'required': ['amount', 'cost', 'market', 'price']
+                "required": ["amount", "cost", "market", "price"],
             },
-            'id': {
-                'type': 'string'
-            },
-            'lowercaseId': {
-                'type': 'string'
-            },
-            'symbol': {
-                'type': 'string'
-            },
-            'base': {
-                'type': 'string'
-            },
-            'quote': {
-                'type': 'string'
-            },
-            'baseId': {
-                'type': 'string'
-            },
-            'quoteId': {
-                'type': 'string'
-            },
-            'info': {
-                'type':
-                'object',
-                'properties': {
-                    'symbol': {
-                        'type': 'string'
-                    },
-                    'status': {
-                        'type': 'string'
-                    },
-                    'baseAsset': {
-                        'type': 'string'
-                    },
-                    'baseAssetPrecision': {
-                        'type': 'integer'
-                    },
-                    'quoteAsset': {
-                        'type': 'string'
-                    },
-                    'quotePrecision': {
-                        'type': 'integer'
-                    },
-                    'quoteAssetPrecision': {
-                        'type': 'integer'
-                    },
-                    'baseCommissionPrecision': {
-                        'type': 'integer'
-                    },
-                    'quoteCommissionPrecision': {
-                        'type': 'integer'
-                    },
-                    'orderTypes': {
-                        'type': 'array', 'items': {
-                            'type': 'string'
-                        }
-                    },
-                    'icebergAllowed': {
-                        'type': 'boolean'
-                    },
-                    'ocoAllowed': {
-                        'type': 'boolean'
-                    },
-                    'quoteOrderQtyMarketAllowed': {
-                        'type': 'boolean'
-                    },
-                    'isSpotTradingAllowed': {
-                        'type': 'boolean'
-                    },
-                    'isMarginTradingAllowed': {
-                        'type': 'boolean'
-                    },
-                    'filters': {
-                        'type': 'array',
-                        'items': {
-                            'type': 'object',
-                            'properties': {
-                                'filterType': {
-                                    'type': 'string'
-                                },
-                                'minPrice': {
-                                    'type': 'string'
-                                },
-                                'maxPrice': {
-                                    'type': 'string'
-                                },
-                                'tickSize': {
-                                    'type': 'string'
-                                },
-                                'multiplierUp': {
-                                    'type': 'string'
-                                },
-                                'multiplierDown': {
-                                    'type': 'string'
-                                },
-                                'avgPriceMins': {
-                                    'type': 'integer'
-                                },
-                                'minQty': {
-                                    'type': 'string'
-                                },
-                                'maxQty': {
-                                    'type': 'string'
-                                },
-                                'stepSize': {
-                                    'type': 'string'
-                                },
-                                'minNotional': {
-                                    'type': 'string'
-                                },
-                                'applyToMarket': {
-                                    'type': 'boolean'
-                                },
-                                'limit': {
-                                    'type': 'integer'
-                                },
-                                'maxNumOrders': {
-                                    'type': 'integer'
-                                },
-                                'maxNumAlgoOrders': {
-                                    'type': 'integer'
-                                }
+            "id": {"type": "string"},
+            "lowercaseId": {"type": "string"},
+            "symbol": {"type": "string"},
+            "base": {"type": "string"},
+            "quote": {"type": "string"},
+            "baseId": {"type": "string"},
+            "quoteId": {"type": "string"},
+            "info": {
+                "type": "object",
+                "properties": {
+                    "symbol": {"type": "string"},
+                    "status": {"type": "string"},
+                    "baseAsset": {"type": "string"},
+                    "baseAssetPrecision": {"type": "integer"},
+                    "quoteAsset": {"type": "string"},
+                    "quotePrecision": {"type": "integer"},
+                    "quoteAssetPrecision": {"type": "integer"},
+                    "baseCommissionPrecision": {"type": "integer"},
+                    "quoteCommissionPrecision": {"type": "integer"},
+                    "orderTypes": {"type": "array", "items": {"type": "string"}},
+                    "icebergAllowed": {"type": "boolean"},
+                    "ocoAllowed": {"type": "boolean"},
+                    "quoteOrderQtyMarketAllowed": {"type": "boolean"},
+                    "isSpotTradingAllowed": {"type": "boolean"},
+                    "isMarginTradingAllowed": {"type": "boolean"},
+                    "filters": {
+                        "type": "array",
+                        "items": {
+                            "type": "object",
+                            "properties": {
+                                "filterType": {"type": "string"},
+                                "minPrice": {"type": "string"},
+                                "maxPrice": {"type": "string"},
+                                "tickSize": {"type": "string"},
+                                "multiplierUp": {"type": "string"},
+                                "multiplierDown": {"type": "string"},
+                                "avgPriceMins": {"type": "integer"},
+                                "minQty": {"type": "string"},
+                                "maxQty": {"type": "string"},
+                                "stepSize": {"type": "string"},
+                                "minNotional": {"type": "string"},
+                                "applyToMarket": {"type": "boolean"},
+                                "limit": {"type": "integer"},
+                                "maxNumOrders": {"type": "integer"},
+                                "maxNumAlgoOrders": {"type": "integer"},
                             },
-                            'required': ['filterType']
-                        }
+                            "required": ["filterType"],
+                        },
                     },
-                    'permissions': {
-                        'type': 'array', 'items': {
-                            'type': 'string'
-                        }
-                    }
+                    "permissions": {"type": "array", "items": {"type": "string"}},
                 },
-                'required': [
-                    'baseAsset',
-                    'baseAssetPrecision',
-                    'baseCommissionPrecision',
-                    'filters',
-                    'icebergAllowed',
-                    'isMarginTradingAllowed',
-                    'isSpotTradingAllowed',
-                    'ocoAllowed',
-                    'orderTypes',
-                    'permissions',
-                    'quoteAsset',
-                    'quoteAssetPrecision',
-                    'quoteCommissionPrecision',
-                    'quoteOrderQtyMarketAllowed',
-                    'quotePrecision',
-                    'status',
-                    'symbol'
-                ]
+                "required": [
+                    "baseAsset",
+                    "baseAssetPrecision",
+                    "baseCommissionPrecision",
+                    "filters",
+                    "icebergAllowed",
+                    "isMarginTradingAllowed",
+                    "isSpotTradingAllowed",
+                    "ocoAllowed",
+                    "orderTypes",
+                    "permissions",
+                    "quoteAsset",
+                    "quoteAssetPrecision",
+                    "quoteCommissionPrecision",
+                    "quoteOrderQtyMarketAllowed",
+                    "quotePrecision",
+                    "status",
+                    "symbol",
+                ],
             },
-            'margin': {
-                'type': 'boolean'
-            },
-            'future': {
-                'type': 'boolean'
-            },
-            'percentage': {
-                'type': 'boolean'
-            },
-            'type': {
-                'type': 'string'
-            },
-            'spot': {
-                'type': 'boolean'
-            },
-            'delivery': {
-                'type': 'boolean'
-            },
-            'active': {
-                'type': 'boolean'
-            }
+            "margin": {"type": "boolean"},
+            "future": {"type": "boolean"},
+            "percentage": {"type": "boolean"},
+            "type": {"type": "string"},
+            "spot": {"type": "boolean"},
+            "delivery": {"type": "boolean"},
+            "active": {"type": "boolean"},
         },
-        'required': [
-            'base',
-            'baseId',
-            'future',
-            'id',
-            'info',
-            'limits',
-            'lowercaseId',
-            'maker',
-            'margin',
-            'precision',
-            'quote',
-            'quoteId',
-            'symbol',
-            'taker',
-            'tierBased'
-        ]
+        "required": [
+            "base",
+            "baseId",
+            "future",
+            "id",
+            "info",
+            "limits",
+            "lowercaseId",
+            "maker",
+            "margin",
+            "precision",
+            "quote",
+            "quoteId",
+            "symbol",
+            "taker",
+            "tierBased",
+        ],
     }
     return local_schema

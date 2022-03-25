@@ -22,7 +22,7 @@ from pydantic import EmailStr
 from pydantic import Field
 from pydantic import validate_arguments
 
-from mangostar import commands as commandss
+from bodhi_server import commands as commandss
 
 
 # from stringcase import snakecase
@@ -163,7 +163,7 @@ class Source(BaseModel):
 # ).filter(lambda x: x is not None)
 
 
-# # @patch("mangostar.logic.maestro.NameMaestro.create_view", autospec=True)
+# # @patch("bodhi_server.logic.maestro.NameMaestro.create_view", autospec=True)
 # @settings(deadline=500)
 @given(st.builds(Source))
 def test_insert_duplicate_schema(skybringer: Source):

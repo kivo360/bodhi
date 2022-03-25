@@ -13,6 +13,6 @@ RUN apt-get update \
 RUN pip install graphviz pygraphviz
 RUN pip install -r requirements.txt
 
-ENV MODULE_NAME="mangostar.service.app"
+ENV MODULE_NAME="bodhi_service.service.app"
 
-COPY ./mangostar /app/mangostar
+COPY ./bodhi_service /app/bodhi_service
