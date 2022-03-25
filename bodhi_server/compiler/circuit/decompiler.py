@@ -18,20 +18,20 @@ from bodhi_server.compiler import (
     Visitor,
 )
 from pydantic import Field
-from bodhi_server import FModel
+from bodhi_server import FlexModel
 from bodhi_server.compiler.callables import *
 from bodhi_server.compiler import ICallable
 from bodhi_server.compiler.env import Environment
 from bodhi_server.compiler.operations import *
+from bodhi_server.compiler import ExprVisitor
 
 CWD_DIR = Path.cwd()
 
 
-@dataclass
-class __Interpreter(FModel, Visitor):  # type: ignore
-    environment: Optional[Environment] = None
+class __Interpreter(Visitor, ExprVisitor, StmtVisitor):  # type: ignore
     globals: Environment = Environment()
-    locals: Dict[Expr, int] = {}  # type: ignore
+    environment: Optional[Environment] = None
+    locals: Dict[Expr, int] = dict()  # type: ignore
 
     @property
     def env(self):
@@ -45,11 +45,11 @@ class __Interpreter(FModel, Visitor):  # type: ignore
         self._env = Environment
 
     def resolve(self, expr: Expr, depth: int):
-        self.locals[expr] = depth
+        self.locals[expr] = depth  # type: ignore
         return
 
     def look_up_variable(self, name: Token, expr: Expr):
-        distance = self.locals.get(expr, None)
+        distance = self.locals.get(expr, None)  # type: ignore
         if distance is not None:
             return self.env.get_at(distance, name.lexeme)
         return self.globals.access(name)
@@ -134,6 +134,9 @@ class __Interpreter(__Interpreter):
     def evaluate(self, node: "Node") -> Any:
         return self.visit(node)
 
+    def execute(self, stmt: Stmt):
+        return self.visit(stmt)
+
 
 class Interpreter(__Interpreter):
     """Statement managment"""
@@ -191,7 +194,7 @@ class Interpreter(__Interpreter):
                 return left
         return self.evaluate(expr.right)
 
-    def visit_while_stmt(self, stmt: Stmt):
+    def visit_while_stmt(self, stmt: While):
         while self.is_truthy(self.evaluate(stmt.condition)):
             self.execute(stmt.body)
 
@@ -201,10 +204,10 @@ class Interpreter(__Interpreter):
         args = []
         for arg in expr.arguments:
             args.append(self.evaluate(arg))
-        if not isinstance(expr.paren, ABCCallable):
+        if not isinstance(expr.paren, ICallable):
             raise RuntimeError("Can only call functions and classes")
 
-        func = cast(ABCCallable, callee)
+        func = cast(ICallable, callee)
         size = func.arity()
         arg_count = len(args)
         if arg_count != size:

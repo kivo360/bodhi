@@ -19,6 +19,7 @@ from bodhi_server.compiler import (
     Grouping,
     Literal,
     ExprVisitor,
+    StmtVisitor,
 )  # isort:skip
 
 CWD_DIR = Path.cwd()
@@ -57,6 +58,9 @@ class Assign(Expr):
 
     name: Token
     value: Expr
+
+    # def accept(self, visitor: ExprVisitor):
+    #     return visitor.visit_assign(self)
 
 
 class Block(Stmt):
