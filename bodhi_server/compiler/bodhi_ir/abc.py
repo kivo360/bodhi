@@ -16,18 +16,6 @@ class ASTEdge(FlexModel, ABC):
     type: EdgeTypes
 
 
-class ExprEdge(ASTEdge):
-    type: EdgeTypes = EdgeTypes.EXPR
-
-
-class Left(ASTEdge):
-    type: EdgeTypes = EdgeTypes.LEFT
-
-
-class Right(ASTEdge):
-    type: EdgeTypes = EdgeTypes.RIGHT
-
-
 class ASTNode(FlexModel, ABC):
     name: str = utils.hexid()
     value: Optional[Any] = None

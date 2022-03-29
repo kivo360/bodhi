@@ -1,16 +1,19 @@
-from typing import Union
+from typing import Union, List, Optional, Any, Dict, cast
 
 from loguru import logger
+from bodhi_server.compiler import scope
 
-import bodhi_server.compiler.circuit.decompiler as inter
+import bodhi_server.compiler.bodhi_ir.core as inter
+from bodhi_server.compiler import *
 from bodhi_server.compiler.callables import *
 from bodhi_server.compiler.operations import *
-from bodhi_server.compiler import Visitor
+from bodhi_server.compiler.utils import is_lit, is_binary, is_unary
+from bodhi_server import utils
 
 
 class Resolver(Visitor):
-    interpreter = inter.Interpreter
-    scopes: List[Dict[str, bool]] = field(default_factory=[])
+    interpreter: inter.IRAnalyzer
+    scopes: List[Dict[str, bool]] = []
 
     @property
     def scope_len(self):
@@ -33,10 +36,13 @@ class Resolver(Visitor):
         for statement in statements:
             self.resolve(statement)
 
-    def resolve(self, stmt: Union[Stmt, Expr]):
-        self.visit(stmt)
+    def resolve(self, stmts: Union[Stmt, Expr, List[Stmt], List[Expr]]):
+        stmts = utils.listify(stmts)
+        for stmt in stmts:
+            self.visit(stmt)
 
     def begin_scope(self):
+
         self.scopes.append({})
 
     def end_scope(self):
@@ -64,10 +70,10 @@ class Resolver(Visitor):
             return
         self.resolve_local(expr, expr.name)
 
-    def resolve_local(self, expr: Expr, name: Token):
+    def resolve_local(self, expr: Union[Expr, Stmt], name: Token):
         for idx, item in enumerate(reversed(self.scopes)):
             if name.lexeme in item:
-                self.interpreter.resolve(expr, idx)
+                self.interpreter.resolve(expr=expr, depth=idx)  # type: ignore
                 return
 
     def visit_assign_expr(self, expr: Assign):
@@ -77,12 +83,12 @@ class Resolver(Visitor):
     def visit_function_stmt(self, stmt: Function):
         self.declare(stmt.name)
         self.define(stmt.name)
-
+        logger.debug(stmt)
         self.resolve_function(stmt)
 
     def resolve_function(self, func: Function) -> None:
         self.begin_scope()
-
+        logger.debug(self.scopes)
         for param in func.params:
             self.declare(param)
             self.define(param)
@@ -131,3 +137,15 @@ class Resolver(Visitor):
 
     def visit_unary_expr(self, expr: Unary):
         self.resolve(expr.expr)
+
+    def resolve_stmts(self, statements: List[Stmt]):
+        for statement in statements:
+            self.resolve(statement)
+
+    def instance_visit(self, node: Expr):
+        if is_binary(node):
+            self.visit_binary(cast(Binary, node))
+            return True
+        if is_lit(node):
+            self.visit_literal_expr(cast(Literal, node))
+            return True

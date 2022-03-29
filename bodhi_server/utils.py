@@ -2,7 +2,7 @@ import hashlib
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
 import uuid
 
 from inflection import parameterize
@@ -214,6 +214,16 @@ def graphviz_show(
 
         return
     drawing.show(title=(filename.split(".")[0] if filename else "A Graph Image"))
+
+
+def is_list(value):
+    return isinstance(value, list)
+
+
+def listify(value: Union[Any, List[Any]]) -> List[Any]:
+    if not is_list(value):
+        return [value]
+    return value
 
 
 end_all(globals())

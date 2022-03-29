@@ -8,7 +8,12 @@ from pydantic import BaseModel
 from bodhi_server.settings import ModuleSettings
 
 from .adapters.connection_adapter import ConnectionAdapter
-from .core import FlexibleModel, FlexibleModel as FlexModel, FlexibleModel as FModel
+from .core import (
+    FlexibleModel,
+    FlexibleModel as FlexModel,
+    FlexibleModel as FModel,
+    dataclass,
+)
 
 from .main import Component
 from .main import Entity

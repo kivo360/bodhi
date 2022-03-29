@@ -2,7 +2,7 @@ from typing import Any, Optional
 from bodhi_server import FlexModel
 from abc import ABC
 from bodhi_server.compiler import Token, TokenType, EdgeTypes
-from bodhi_server.compiler.circuit.core import ASTEdge
+from bodhi_server.compiler.bodhi_ir.abc import ASTEdge
 
 
 class Expr(ASTEdge):
@@ -23,3 +23,15 @@ class IsTrue(ASTEdge):
 
 class IsFalse(ASTEdge):
     type: EdgeTypes = EdgeTypes.BRANCH_FALSE
+
+
+class Condition(ASTEdge):
+    type: EdgeTypes = EdgeTypes.BRANCH_FALSE
+
+
+class GroupIn(Expr):
+    pass
+
+
+class Value(ASTEdge):
+    type: EdgeTypes = EdgeTypes.VALUE

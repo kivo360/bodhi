@@ -66,9 +66,11 @@ class EdgeTypes(str, Enum):
     BODY = ("BODY",)
     BRANCH_FALSE = ("BRANCH_FALSE",)
     BRANCH_TRUE = ("BRANCH_TRUE",)
+    CONDITION = ("CONDITION",)
     LEFT = ("EXPR_LEFT",)
     RIGHT = ("EXPR_RIGHT",)
     EXPR = ("EXPR",)
+    VALUE = ("VALUE",)
 
 
 class OpType(str, Enum):
@@ -134,6 +136,7 @@ class NodeType(str, Enum):
     FOR = "FOR"
     BREAK = "BREAK"
     CONTINUE = "CONTINUE"
+    VALUE = "VALUE"
 
 
 end_all(globals())

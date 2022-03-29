@@ -4,9 +4,9 @@ from typing import Any, List, Optional
 from auto_all import end_all, start_all
 
 
-from .interpreter import Interpreter
-from .abcs import ICallable
-from .env import Environment
+from bodhi_server.compiler.bodhi_ir.core import IRAnalyzer
+from bodhi_server.compiler import ICallable
+from bodhi_server.compiler.env import Environment
 from .operations import *
 
 from bodhi_server.compiler import (
@@ -23,14 +23,14 @@ from bodhi_server.compiler import (
 start_all(globals())
 
 
-from dataclasses import dataclass, field  # isort:skip
+from dataclasses import dataclass
 
 
 class Clock(ICallable):
     def arity(self) -> int:
         return 0
 
-    def call(self, inter: "Interpreter", args: List[Any]) -> float:
+    def call(self, inter: "IRAnalyzer", args: List[Any]) -> float:
         return time.time() / 1000.0
 
     def __str__(self):
@@ -51,7 +51,7 @@ class DubFunction(ICallable):
     def arity(self) -> int:
         return len(self.declaration.params)
 
-    def call(self, interpreter: "Interpreter", *args):
+    def call(self, interpreter: "IRAnalyzer", *args):
         environ = Environment(enclosing=self.closure)
         for arg, param in zip(args, self.declaration.params):
             environ.define(param.lexeme, arg)

@@ -1,7 +1,7 @@
 from typing import Any, Union, Optional
 
 from bodhi_server.compiler import OpType, BinopType, UnaryType, NodeType, TokenType
-from bodhi_server.compiler.circuit.core import ASTNode
+from bodhi_server.compiler.bodhi_ir.abc import ASTNode
 
 AstType = Union[TokenType, UnaryType, BinopType, NodeType, OpType, None]
 

@@ -5,20 +5,35 @@ from loguru import logger
 from pydantic import BaseModel
 from pydantic.fields import Field, FieldInfo
 from pydantic.main import ModelMetaclass
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple, TypeVar, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Iterable,
+    Optional,
+    Tuple,
+    TypeVar,
+    Union,
+    TYPE_CHECKING,
+)
 from .utils import __dataclass_transform__
+from pydantic.dataclasses import dataclass
 
-# _T = TypeVar("_T")
+if TYPE_CHECKING:
+
+    from dataclasses import dataclass
+
+_T = TypeVar("_T")
 
 
-# def __dataclass_transform__(
-#     *,
-#     eq_default: bool = True,
-#     order_default: bool = False,
-#     kw_only_default: bool = False,
-#     field_descriptors: Tuple[Union[type, Callable[..., Any]], ...] = (()),
-# ) -> Callable[[_T], _T]:
-#     return lambda a: a
+def __dataclass_transform__(
+    *,
+    eq_default: bool = True,
+    order_default: bool = False,
+    kw_only_default: bool = False,
+    field_descriptors: Tuple[Union[type, Callable[..., Any]], ...] = (()),
+) -> Callable[[_T], _T]:
+    return lambda a: a
 
 
 @__dataclass_transform__(kw_only_default=True, field_descriptors=(Field, FieldInfo))
