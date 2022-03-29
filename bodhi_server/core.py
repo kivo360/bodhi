@@ -2,7 +2,7 @@ from typing import Optional, Union
 
 from loguru import logger
 
-from pydantic import BaseModel
+from pydantic import BaseConfig, BaseModel, Extra
 from pydantic.fields import Field, FieldInfo
 from pydantic.main import ModelMetaclass
 from typing import (
@@ -17,11 +17,13 @@ from typing import (
     TYPE_CHECKING,
 )
 from .utils import __dataclass_transform__
+
+
+# if TYPE_CHECKING:
+
+#     from dataclasses import dataclass
+# else:
 from pydantic.dataclasses import dataclass
-
-if TYPE_CHECKING:
-
-    from dataclasses import dataclass
 
 _T = TypeVar("_T")
 
@@ -41,17 +43,22 @@ class ParameterMetaclass(ModelMetaclass):
     pass
 
 
+class CommonConfig(BaseConfig):
+    extra = Extra.allow
+    arbitrary_types_allowed = True
+
+
 class FlexibleModel(BaseModel):
-    class Config:
-        extra = "allow"
-        arbitrary_types_allowed = "allow"
+    class Config(CommonConfig):
+        arbitrary_types_allowed = True
+        extra = Extra.allow
 
 
 FlexModel = FlexibleModel
 
 
-class Example(FlexModel):
-    hello: str = "World"
+def base_conf():
+    return CommonConfig
 
 
 def main():

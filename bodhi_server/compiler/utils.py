@@ -1,5 +1,6 @@
 from bodhi_server.compiler import Token, TokenType, Binary, Unary
 from bodhi_server.compiler import Binary, Literal, Expr
+from addict import Dict
 
 # from bodhi_server.compiler import Binary
 from auto_all import start_all, end_all
@@ -19,3 +20,7 @@ def is_lit(val) -> bool:
 
 def is_unary(val) -> bool:
     return isinstance(val, Unary)
+
+
+def flexify(val: dict):
+    return Dict(val)

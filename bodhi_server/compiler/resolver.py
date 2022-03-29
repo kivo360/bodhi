@@ -1,5 +1,3 @@
-from typing import Union, List, Optional, Any, Dict, cast
-
 from loguru import logger
 from bodhi_server.compiler import scope
 
@@ -9,6 +7,9 @@ from bodhi_server.compiler.callables import *
 from bodhi_server.compiler.operations import *
 from bodhi_server.compiler.utils import is_lit, is_binary, is_unary
 from bodhi_server import utils
+from devtools import debug
+
+from typing import Union, List, Optional, Any, Dict, cast
 
 
 class Resolver(Visitor):
@@ -28,6 +29,7 @@ class Resolver(Visitor):
     def visit_block_stmt(self, stmt: Block):
         self.begin_scope()
         # self.declare(stmt.)
+
         self.resolve_list(stmt.stmts)
         self.end_scope()
         return
@@ -36,7 +38,7 @@ class Resolver(Visitor):
         for statement in statements:
             self.resolve(statement)
 
-    def resolve(self, stmts: Union[Stmt, Expr, List[Stmt], List[Expr]]):
+    def resolve(self, stmts: Union[List[Stmt], List[Expr], Stmt, Expr]):
         stmts = utils.listify(stmts)
         for stmt in stmts:
             self.visit(stmt)
@@ -83,12 +85,11 @@ class Resolver(Visitor):
     def visit_function_stmt(self, stmt: Function):
         self.declare(stmt.name)
         self.define(stmt.name)
-        logger.debug(stmt)
+        debug(stmt)
         self.resolve_function(stmt)
 
     def resolve_function(self, func: Function) -> None:
         self.begin_scope()
-        logger.debug(self.scopes)
         for param in func.params:
             self.declare(param)
             self.define(param)
@@ -142,10 +143,16 @@ class Resolver(Visitor):
         for statement in statements:
             self.resolve(statement)
 
-    def instance_visit(self, node: Expr):
+    def instance_visit(self, node: Node):
         if is_binary(node):
             self.visit_binary(cast(Binary, node))
             return True
         if is_lit(node):
             self.visit_literal_expr(cast(Literal, node))
             return True
+
+    def visit_expr_stmt(self, stmt: ExprStmt):
+        self.resolve(stmt.expr)
+
+    def visit_module(self, module: Module):
+        self.resolve_stmts(module.body)

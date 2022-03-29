@@ -88,7 +88,7 @@ class ILiteral(ABC):
 
 
 class Node(FlexModel, INode, abc.ABC):
-    node_decomposer: Optional[INodeDecomp] = None
+    # node_decomposer: Optional[INodeDecomp] = None
 
     @property
     def cls_name(self) -> str:
@@ -108,17 +108,6 @@ class Node(FlexModel, INode, abc.ABC):
 
     def visit(self, visitor: "Visitor"):
         visitor.visit(self)
-
-    def decompose(self, env: IASTGraph):
-        if isinstance(self, IToken):
-            raise TypeError(
-                f"The node {self.node_name} is a Token. It cannot be decomposed."
-            )
-
-        if not self.node_decomposer:
-            raise AttributeError("The node_decomposer is not set.")
-        self.node_decomposer.env = env
-        return self.node_decomposer.decompose(self)
 
 
 class Token(Node, IToken):

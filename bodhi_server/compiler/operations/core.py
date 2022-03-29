@@ -1,6 +1,6 @@
 """This has all of the core operations. We base everything else off of these operations."""
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 from auto_all import end_all, start_all
 from pydantic import Field
@@ -59,6 +59,10 @@ class Assign(Expr):
     #     return visitor.visit_assign(self)
 
 
+class Module(Stmt):
+    body: List[Stmt] = []
+
+
 class Block(Stmt):
     stmts: List[Stmt] = []
 
@@ -81,8 +85,8 @@ class While(Conditional):
 class For(Stmt):
     target: Expr
     iter: Expr
-    body: Stmt
-    orelse: Optional[Stmt] = None
+    body: Block
+    orelse: Optional[Block] = None
 
 
 class Call(Stmt):
@@ -104,11 +108,19 @@ class Logical(Expr):
 
 class Function(Stmt):
     name: Token
-    body: List[Expr] = []
+    body: Block
     params: List[Token] = []
 
     def get_name(self):
         return self.name.node_name
+
+
+class Break(Stmt):
+    pass
+
+
+class Continue(Stmt):
+    pass
 
 
 class String(Literal):
@@ -177,7 +189,7 @@ def while_stmt(cond: Expr, body: Stmt) -> While:
     return While(condition=cond, body=body)
 
 
-def for_stmt(target: Expr, iter: Expr, body: Stmt, orelse: Optional[Stmt]) -> For:
+def for_stmt(target: Expr, iter: Expr, body: Block, orelse: Optional[Block]) -> For:
     return For(target=target, iter=iter, body=body, orelse=orelse)
 
 
@@ -189,7 +201,7 @@ def return_stmt(kwd: Token, value: Expr) -> Return:
     return Return(keyword=kwd, value=value)
 
 
-def fn_stmt(name: str, body: List[Expr], params: List[Token]) -> Function:
+def fn_stmt(name: str, body: Block, params: List[Token]) -> Function:
     return Function(name=varname(name), body=body, params=params)
 
 

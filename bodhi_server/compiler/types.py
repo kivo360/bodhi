@@ -139,4 +139,38 @@ class NodeType(str, Enum):
     VALUE = "VALUE"
 
 
+class Flavor(Enum):
+    """Flavor describes the kind of object a node represents."""
+
+    UNSPECIFIED = "---"  # as it says on the tin
+    UNKNOWN = "???"  # not determined by analysis (wildcard)
+
+    NAMESPACE = "namespace"  # node representing a namespace
+    ATTRIBUTE = "attribute"  # attr of something, but not known if class or func.
+
+    IMPORTEDITEM = "import"  # imported item of unanalyzed type
+
+    MODULE = "module"
+    GLOBAL = "global"
+    CLASS = "class"
+    FUNCTION = "function"
+    METHOD = "method"  # instance method
+    STATICMETHOD = "staticmethod"
+    CLASSMETHOD = "classmethod"
+    NAME = "name"  # Python name (e.g. "x" in "x = 42")
+    BLOCK = "block"  # Python name (e.g. "x" in "x = 42")
+
+    @staticmethod
+    def specificity(flavor):
+
+        if flavor in (Flavor.UNSPECIFIED, Flavor.UNKNOWN):
+            return 0
+        elif flavor in (Flavor.NAMESPACE, Flavor.ATTRIBUTE):
+            return 1
+        elif flavor == Flavor.IMPORTEDITEM:
+            return 2
+        else:
+            return 3
+
+
 end_all(globals())

@@ -1,12 +1,8 @@
-from .core import Binary
+from bodhi_server.compiler import Binary
 from bodhi_server.compiler import Token
 from bodhi_server.compiler import BinopType
 from bodhi_server.compiler import NodeType, Expr
 
-from bodhi_server.compiler import OpType
-from bodhi_server.compiler import TokenType
-from bodhi_server.compiler import UnaryType
-from bodhi_server.compiler.types import TokenType
 from auto_all import start_all, end_all
 
 start_all(globals())

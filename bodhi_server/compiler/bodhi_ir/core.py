@@ -2,12 +2,13 @@ import abc
 import time
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Union, cast, Dict, List, Optional
+from typing import Any, cast, Dict, List, Optional, Union
 
+from devtools import debug
 from loguru import logger
 
 import retworkx as rx
-from pydantic import Field
+from pydantic import Field, root_validator
 from rich import print
 
 from bodhi_server import FlexModel
@@ -24,13 +25,29 @@ from bodhi_server.compiler import Token
 from bodhi_server.compiler import TokenType
 from bodhi_server.compiler import Unary
 from bodhi_server.compiler import Visitor
-from bodhi_server.compiler.bodhi_ir.abc import ASTNode
-from bodhi_server.compiler.callables import *
-from bodhi_server.compiler.env import Environment
-from bodhi_server.compiler.operations import *
+from bodhi_server.compiler.utils import flexify
+
+# from bodhi_server.compiler.callables import Clock
 from bodhi_server.compiler.bodhi_ir import edges as ex
 from bodhi_server.compiler.bodhi_ir import nodes as dx
-from devtools import debug
+from bodhi_server.compiler.bodhi_ir.abc import ASTNode
+from bodhi_server.compiler.env import Environment
+from bodhi_server.compiler.operations import Assign
+from bodhi_server.compiler.operations import Block
+from bodhi_server.compiler.operations import Break
+from bodhi_server.compiler.operations import Continue
+from bodhi_server.compiler.operations import ExprStmt
+from bodhi_server.compiler.operations import Function
+from bodhi_server.compiler.operations import If
+from bodhi_server.compiler.operations import Print
+from bodhi_server.compiler.operations import Return, Var
+from bodhi_server.compiler.operations import While, Module
+
+# from bodhi_server.compiler.operations import *
+
+
+# from typing import Any, Union, cast, Dict, List, Optional
+
 
 CWD_DIR = Path.cwd()
 
@@ -53,6 +70,8 @@ class __IRAnalyzer(Visitor, ExprVisitor, StmtVisitor):  # type: ignore
             return self.visit_unary(node)
         elif isinstance(node, Binary):
             return self.visit_binary(node)
+        else:
+            return None
 
     @property
     def ast(self) -> rx.PyDAG:
@@ -67,10 +86,6 @@ class __IRAnalyzer(Visitor, ExprVisitor, StmtVisitor):  # type: ignore
         if self.environment is None:
             raise AttributeError("Environment is not defined.")
         return self.environment
-
-    @env.setter
-    def env(self, value: Environment):
-        self.environment = Environment
 
     def resolve(self, expr: Expr, depth: int):
         self.locals[expr] = depth  # type: ignore
@@ -127,6 +142,10 @@ class __IRAnalyzer(__IRAnalyzer):  # type: ignore
         val_node = self.ast.add_node(dx.Value(value=node.value))
         return val_node
 
+    def visit_module(self, expr: Module):
+        for stmt in expr.body:
+            self.visit(stmt)
+
     def visit_variable_expr(self, expr: Expr):
         raise NotImplementedError
 
@@ -167,7 +186,8 @@ class __IRAnalyzer(__IRAnalyzer):
 
     def visit_function_stmt(self, stmt: Function):
         # We're giving a function a name
-        self.env.define(stmt.name.lexeme, stmt)
+        self.env.define(stmt.name.lexeme, stmt)  # It's sort of doing what I need it to.
+        debug(self.env)
 
     def visit_return_stmt(self, stmt: Stmt):
         raise NotImplementedError
@@ -210,7 +230,7 @@ def run(stmts: Union[List[Stmt], Stmt]) -> rx.PyDAG:
     resolver = Resolver(interpreter=analyzer)
     resolver.resolve_stmts(stmts)
     analyzer.analyze(stmts)
-    debug(resolver)
+    # debug(resolver)
     return analyzer.ast
 
 
@@ -219,16 +239,26 @@ def main():
 
     logger.info("Starting the interpreter")
     # analyzer = IRAnalyzer()
-    fnx = opx.fn_stmt(
-        "hello",
-        [
-            opx.add(
-                left=opx.float_lt(2),
-                right=opx.float_lt(2),
+
+    fnx = Module(
+        body=[
+            opx.fn_stmt(
+                "hello",
+                opx.block(
+                    [
+                        ExprStmt(
+                            expr=opx.add(
+                                left=opx.float_lt(2),
+                                right=opx.float_lt(2),
+                            )
+                        )
+                    ]
+                ),
+                [],
             )
-        ],
-        [],
+        ]
     )
+    # debug(fnx)
     run([fnx])
     # analyzer.analyze([fnx])
     # nested_scopes = "var hello = 1234.456;"
