@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 from auto_all import start_all, end_all
 
 start_all(globals())
@@ -171,6 +172,9 @@ class Flavor(Enum):
             return 2
         else:
             return 3
+
+
+AstType = Union[TokenType, UnaryType, BinopType, NodeType, OpType, None]
 
 
 end_all(globals())

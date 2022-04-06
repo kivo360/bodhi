@@ -1,3 +1,4 @@
+import random
 from devtools import debug
 from typing import Any, Dict, List
 from loguru import logger
@@ -9,6 +10,7 @@ from bodhi_server import FMod
 from bodhi_server import rx
 from bodhi_server.compiler import Flavor
 from bodhi_server.compiler.utils import flexify
+from bodhi_server import utils
 from pydantic import root_validator
 
 # type: ignore
@@ -60,7 +62,7 @@ class Hierarchy(FMod):
         return curr_idx
 
     def revert_scope(self):
-        return self.parents()
+        return self.parent()
 
     def set_scope(self, namespace: str):
         if namespace in self.scope_mapping:
@@ -71,8 +73,11 @@ class Hierarchy(FMod):
             self.curr_scope = node_idx
         return False
 
-    def parents(self):
+    def parent(self):
         return self.direct_predecessors(self.curr_scope)
+
+    def parents(self):
+        return self.net.predecessors(self.curr_scope)
 
     def direct_successors(self, node_id):
         """
@@ -125,9 +130,14 @@ class NamespaceLink(FMod):
     defs: Dict[str, List[str]] = Field(default_factory=dict)
     uses: Dict[str, List[str]] = Field(default_factory=dict)
 
-    def sort_defs(self, name: str):
-        # if name in self.defs:
-        return list(sorted(reversed(self.defs[name])))
+    def sort_defs(self, name: str, scope_map: Dict[str, int]):
+        map_idxs = list(
+            map(lambda x: {"name": name, "idx": scope_map[x]}, self.defs[name])
+        )
+        print(map_idxs)
+
+        sorted_map = sorted(map_idxs, key=lambda x: x["idx"])
+        return list(reversed(sorted_map))
 
 
 class ScopeConroller(FMod):
@@ -200,32 +210,61 @@ class ScopeConroller(FMod):
 
     def assign(self, symbol: str, expr_id: int):
         if self.is_defined(symbol):
+            if self.is_defined_local(symbol):
+                self.is_defined_local(symbol)
+
             self.scope_graph.define(symbol, expr_id)
         else:
             raise RuntimeError("Undefined variable")
 
-    def access(self, symbol: str):
-        if not self.is_defined(symbol):
-            raise RuntimeError("Variable not defined anywhere")
+    # def access(self, symbol: str):
+    #     if not self.is_defined(symbol):
+    #         raise RuntimeError("Variable not defined anywhere")
 
-        for ns in self.names.sort_defs(symbol):
-            pass
+    #     for ns in self.names.sort_defs(symbol):
+    #         pass
+
+    def momentum(self):
+        debug(self.scope_graph.parents())
+        # self.names.sort_defs("momentum", self.scope_graph.scope_mapping)
 
     def access_local(self, symbol: str):
         for ns in self.names.defs[symbol]:
             if ns == self.namespace:
                 return self.scope_graph.access(symbol)
 
+    def draw_scope(self):
+        utils.graphviz_show(
+            self.scope_graph.net, node_attr_fn=lambda x: {"label": x.namespace}
+        )
+
     # CommonConfig
 
 
 @logger.catch
 def main():
+    def count_set():
+        count = 0
+
+        def _get_count():
+            nonlocal count
+            count += random.randint(1, 10)
+            return count
+
+        return _get_count
+
     sc = ScopeConroller()
+    counter = count_set()
     sc.set_scope("cowcheese", Flavor.METHOD)
+    sc.define("momentum", counter())
     sc.set_scope("blue_cheese", Flavor.BLOCK)
+    sc.momentum()
+    sc.define("momentum", counter())
     sc.set_scope("pydantic", Flavor.IMPORTEDITEM)
-    debug(sc.curr_scope())
+    sc.define("momentum", counter())
+
+    sc.momentum()
+    # debug(sc.curr_scope())
     sc.end_scope()
     sc.end_scope()
     sc.end_scope()
@@ -235,8 +274,15 @@ def main():
     sc.end_scope()
     sc.end_scope()
     sc.end_scope()
-    debug(sc.curr_scope())
-    sc.define("x", 2)
+    # debug(sc.curr_scope())
+    sc.define("x", counter())
+    sc.define("love", counter())
+    sc.define("buy", counter())
+    sc.set_scope("lover", Flavor.METHOD)
+    sc.define("momentum", counter())
+    # debug(sc.curr_scope())
+    sc.draw_scope()
+
     # logger.info(scope_control.get_scope())
 
 

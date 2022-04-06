@@ -126,7 +126,7 @@ class Expr(Node, IExpr):
     pass
 
 
-class Stmt(Node, IStmt):
+class Stmt(Node, IStmt, ABC):
     """A statement inside of the internal programming language"""
 
     pass
@@ -153,7 +153,7 @@ class Unary(Expr):
 
 class StmtVisitor(abc.ABC):
     @abc.abstractmethod
-    def visit_expression_stmt(self, stmt: "Expr"):
+    def visit_expression_stmt(self, stmt: Union["Expr", "Stmt", None]):
         raise NotImplementedError
 
     @abc.abstractmethod

@@ -97,7 +97,7 @@ class __IRAnalyzer(Visitor, ExprVisitor, StmtVisitor):  # type: ignore
         return self.globals.access(name)
 
     def __post_init__(self):
-        self.globals.define("clock", Clock())
+        # self.globals.define("clock", Clock())
         self.environment = self.globals
 
     def is_truthy(self, value: Any) -> bool:

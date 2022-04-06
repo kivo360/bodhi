@@ -9,6 +9,7 @@ from bodhi_server.compiler import (
     BinopType,
     NodeType,
 )
+from bodhi_server.compiler.types import AstType
 from bodhi_server import utils
 
 
@@ -19,7 +20,7 @@ class ASTEdge(FlexModel, ABC):
 class ASTNode(FlexModel, ABC):
     name: str = utils.hexid()
     value: Optional[Any] = None
-    type: Union[TokenType, UnaryType, BinopType, NodeType, None] = None
+    type: AstType = None
 
     @property
     def has_token(self) -> bool:
