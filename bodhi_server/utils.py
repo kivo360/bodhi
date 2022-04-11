@@ -2,7 +2,7 @@ import hashlib
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Any, Callable, Dict, Iterable, Optional, Tuple, TypeVar, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, TypeVar, Union
 import uuid
 
 from inflection import parameterize
@@ -25,6 +25,7 @@ from pydantic import validate_arguments
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.sql import ClauseElement
 from retworkx.visualization import graphviz_draw
+from contextlib import contextmanager
 
 _T = TypeVar("_T")
 
@@ -56,7 +57,7 @@ class DynamicGlobalMap(addict.Dict):
 
 
 def consistent_naming(name: str) -> str:
-    return underscore((parameterize(name)))
+    return underscore(parameterize(name))
 
 
 def consistent_classes(name: str) -> str:
@@ -214,6 +215,16 @@ def graphviz_show(
 
         return
     drawing.show(title=(filename.split(".")[0] if filename else "A Graph Image"))
+
+
+def is_list(value):
+    return isinstance(value, list)
+
+
+def listify(value: Union[Any, List[Any]]) -> List[Any]:
+    if not is_list(value):
+        return [value]
+    return value
 
 
 end_all(globals())

@@ -271,3 +271,4 @@ if __name__ == "__main__":
     global_system_dict = global_system.to_dict()
     relationships = filter(lambda x: "adjacencies" in x, global_system_dict)
     logger.warning(len(list(relationships)))
+    logger.info(global_system.net)

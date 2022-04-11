@@ -1,4 +1,5 @@
 from enum import Enum
+from typing import Union
 from auto_all import start_all, end_all
 
 start_all(globals())
@@ -62,13 +63,17 @@ class TokenType(str, Enum):
 
 class EdgeTypes(str, Enum):
     ELSE = ("ELSE",)
+    PARAMS = ("PARAMS",)
     IF = ("IF",)
     BODY = ("BODY",)
     BRANCH_FALSE = ("BRANCH_FALSE",)
     BRANCH_TRUE = ("BRANCH_TRUE",)
+    CONDITION = ("CONDITION",)
     LEFT = ("EXPR_LEFT",)
     RIGHT = ("EXPR_RIGHT",)
     EXPR = ("EXPR",)
+    STMT_OF = ("STMT_OF",)
+    VALUE = ("VALUE",)
 
 
 class OpType(str, Enum):
@@ -122,6 +127,8 @@ class NodeType(str, Enum):
     EXPRSTMT = "EXPRSTMT"
     VARIABLE = "VARIABLE"
     ASSIGN = "ASSIGN"
+    PARAM = "PARAM"
+    PARAMS = "PARAMS"
     BLOCK = "BLOCK"
     IF = "IF"
     WHILE = "WHILE"
@@ -134,6 +141,45 @@ class NodeType(str, Enum):
     FOR = "FOR"
     BREAK = "BREAK"
     CONTINUE = "CONTINUE"
+    VALUE = "VALUE"
+    MODULE = "MODULE"
+
+
+class Flavor(Enum):
+    """Flavor describes the kind of object a node represents."""
+
+    UNSPECIFIED = "---"  # as it says on the tin
+    UNKNOWN = "???"  # not determined by analysis (wildcard)
+
+    NAMESPACE = "namespace"  # node representing a namespace
+    ATTRIBUTE = "attribute"  # attr of something, but not known if class or func.
+
+    IMPORTEDITEM = "import"  # imported item of unanalyzed type
+
+    MODULE = "module"
+    GLOBAL = "global"
+    CLASS = "class"
+    FUNCTION = "function"
+    METHOD = "method"  # instance method
+    STATICMETHOD = "staticmethod"
+    CLASSMETHOD = "classmethod"
+    NAME = "name"  # Python name (e.g. "x" in "x = 42")
+    BLOCK = "block"  # Python name (e.g. "x" in "x = 42")
+
+    @staticmethod
+    def specificity(flavor):
+
+        if flavor in (Flavor.UNSPECIFIED, Flavor.UNKNOWN):
+            return 0
+        elif flavor in (Flavor.NAMESPACE, Flavor.ATTRIBUTE):
+            return 1
+        elif flavor == Flavor.IMPORTEDITEM:
+            return 2
+        else:
+            return 3
+
+
+AstType = Union[TokenType, UnaryType, BinopType, NodeType, OpType, None]
 
 
 end_all(globals())

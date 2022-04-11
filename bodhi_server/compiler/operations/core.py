@@ -1,15 +1,10 @@
 """This has all of the core operations. We base everything else off of these operations."""
-import abc
-from ast import Dict
-from dataclasses import field
-from datetime import datetime
 from pathlib import Path
-from typing import Any, List, Optional
+from typing import Any, List, Optional, Union
 
 from auto_all import end_all, start_all
 from pydantic import Field
 
-from bodhi_server.compiler import TokenType
 from bodhi_server.compiler import Token
 from bodhi_server.compiler import (
     Stmt,
@@ -20,7 +15,8 @@ from bodhi_server.compiler import (
     Literal,
     ExprVisitor,
     StmtVisitor,
-)  # isort:skip
+)
+from bodhi_server.compiler.types import TokenType  # isort:skip
 
 CWD_DIR = Path.cwd()
 
@@ -63,17 +59,25 @@ class Assign(Expr):
     #     return visitor.visit_assign(self)
 
 
+class Module(Stmt):
+    body: List[Stmt] = []
+
+
 class Block(Stmt):
     stmts: List[Stmt] = []
 
 
-class If(Stmt):
+class Conditional(Stmt):
+    condition: Expr
+
+
+class If(Conditional):
     condition: Expr
     then_branch: Stmt
     else_branch: Stmt
 
 
-class While(Stmt):
+class While(Conditional):
     condition: Expr
     body: Stmt
 
@@ -81,8 +85,8 @@ class While(Stmt):
 class For(Stmt):
     target: Expr
     iter: Expr
-    body: Stmt
-    orelse: Optional[Stmt] = None
+    body: Block
+    orelse: Optional[Block] = None
 
 
 class Call(Stmt):
@@ -104,14 +108,53 @@ class Logical(Expr):
 
 class Function(Stmt):
     name: Token
-    body: List[Expr] = []
+    body: Block
     params: List[Token] = []
+
+    def get_name(self):
+        return self.name.node_name
+
+
+class Break(Stmt):
+    pass
+
+
+class Continue(Stmt):
+    pass
+
+
+class String(Literal):
+    value: str
+
+
+class Integer(Literal):
+    value: int
+
+
+class Float(Literal):
+    value: float
 
 
 class ReturnErr(RuntimeError):
     def __init__(self, value: Any, *args: object) -> None:
         super().__init__(*args)
         self.value = value
+
+
+def varname(name: str) -> Token:
+    return Token(token_type=TokenType.IDENTIFIER, lexeme=name)
+
+
+def string(value: str) -> String:
+    return String(value=value)
+
+
+def integer(value: int) -> Integer:
+    return Integer(value=value)
+
+
+def float_lt(value: float) -> Float:
+    return Float(value=value)
 
 
 def expr_stmt(expr: Expr) -> ExprStmt:
@@ -122,16 +165,16 @@ def print_stmt(expr: Expr) -> Print:
     return Print(expr=expr)
 
 
-def var(name: Token, initial: Expr) -> Var:
-    return Var(name=name, initializer=initial)
+def var(name: str, initial: Expr) -> Var:
+    return Var(name=varname(name), initializer=initial)
 
 
-def variable(name: Token) -> Variable:
-    return Variable(name=name)
+def variable(name: str) -> Variable:
+    return Variable(name=varname(name))
 
 
-def assign(name: Token, val: Expr) -> Assign:
-    return Assign(name=name, value=val)
+def assign(name: str, val: Expr) -> Assign:
+    return Assign(name=varname(name), value=val)
 
 
 def block(stmts: List[Stmt]) -> Block:
@@ -146,7 +189,7 @@ def while_stmt(cond: Expr, body: Stmt) -> While:
     return While(condition=cond, body=body)
 
 
-def for_stmt(target: Expr, iter: Expr, body: Stmt, orelse: Optional[Stmt]) -> For:
+def for_stmt(target: Expr, iter: Expr, body: Block, orelse: Optional[Block]) -> For:
     return For(target=target, iter=iter, body=body, orelse=orelse)
 
 
@@ -158,8 +201,8 @@ def return_stmt(kwd: Token, value: Expr) -> Return:
     return Return(keyword=kwd, value=value)
 
 
-def fn_stmt(name: Token, body: List[Expr], params: List[Token]) -> Function:
-    return Function(name=name, body=body, params=params)
+def fn_stmt(name: str, body: Block, params: List[Token]) -> Function:
+    return Function(name=varname(name), body=body, params=params)
 
 
 end_all(globals())

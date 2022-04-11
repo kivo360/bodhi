@@ -1,207 +1,207 @@
 from typing import Any, Union, Optional
 
 from bodhi_server.compiler import OpType, BinopType, UnaryType, NodeType, TokenType
-from bodhi_server.compiler.circuit.core import ASTNode
+from bodhi_server.compiler.bodhi_ir.abc import IRNode
 
 AstType = Union[TokenType, UnaryType, BinopType, NodeType, OpType, None]
 
 
-class Explicit(ASTNode):
+class Explicit(IRNode):
     value: Optional[Any] = None
 
 
-class Group(ASTNode):
+class Group(IRNode):
     """Suggest that the function is written in a parenthesis."""
 
 
-class Binary(ASTNode):
+class Binary(IRNode):
     """Binary operator."""
 
 
-class Unary(ASTNode):
+class Unary(IRNode):
     pass
 
 
-class Add(ASTNode):
+class Add(IRNode):
     type: AstType = BinopType.ADD
     name: str = "+"
 
 
-class Subtract(ASTNode):
+class Subtract(IRNode):
     type: AstType = BinopType.SUB
     name: str = "-"
 
 
-class Multiply(ASTNode):
+class Multiply(IRNode):
     type: AstType = BinopType.MUL
     name: str = "*"
 
 
-class Divide(ASTNode):
+class Divide(IRNode):
     type: AstType = BinopType.DIV
     name: str = "/"
 
 
-class FloorDivide(ASTNode):
+class FloorDivide(IRNode):
     type: AstType = BinopType.FLOORDIV
     name: str = "//"
 
 
-class Modulo(ASTNode):
+class Modulo(IRNode):
     type: AstType = BinopType.MOD
     name: str = "%"
 
 
-class BitOr(ASTNode):
+class BitOr(IRNode):
     type: AstType = BinopType.BIT_OR
     name: str = "|"
 
 
-class BitAnd(ASTNode):
+class BitAnd(IRNode):
     type: AstType = BinopType.BIT_AND
     name: str = "&"
 
 
-class BitXor(ASTNode):
+class BitXor(IRNode):
     type: AstType = BinopType.BIT_XOR
     name: str = "^"
 
 
-class Greater(ASTNode):
+class Greater(IRNode):
     type: AstType = BinopType.GT
     name: str = ">"
 
 
-class GreaterEq(ASTNode):
+class GreaterEq(IRNode):
     type: AstType = BinopType.GE
     name: str = ">="
 
 
-class Less(ASTNode):
+class Less(IRNode):
     type: AstType = BinopType.LT
     name: str = "<"
 
 
-class LessEq(ASTNode):
+class LessEq(IRNode):
     type: AstType = BinopType.LE
     name: str = "<="
 
 
-class Equals(ASTNode):
+class Equals(IRNode):
     type: AstType = BinopType.EQ
     name: str = "=="
 
 
-class NotEquals(ASTNode):
+class NotEquals(IRNode):
     type: AstType = BinopType.NE
     name: str = "!="
 
 
-class And(ASTNode):
+class And(IRNode):
     type: AstType = OpType.AND
     name: str = "and"
 
 
-class Or(ASTNode):
+class Or(IRNode):
     type: AstType = OpType.OR
     name: str = "or"
 
 
-class Plus(ASTNode):
+class Plus(IRNode):
     type: AstType = BinopType.ADD
     name: str = "+"
 
 
-class Minus(ASTNode):
+class Minus(IRNode):
     type: AstType = BinopType.SUB
     name: str = "-"
 
 
-class IsNot(ASTNode):
+class IsNot(IRNode):
     type: AstType = UnaryType.NOT
     name: str = "!"
 
 
-class IsNotTxt(ASTNode):
+class IsNotTxt(IRNode):
     type: AstType = UnaryType.NOT
     name: str = "not"
 
 
-class Program(ASTNode):
+class Program(IRNode):
     type: AstType = NodeType.PROGRAM
     name: str = "program"
 
 
-class Class(ASTNode):
+class Class(IRNode):
     type: AstType = NodeType.CLASS
     name: str = "class"
 
 
-class ExprStmt(ASTNode):
+class ExprStmt(IRNode):
     type: AstType = NodeType.EXPRSTMT
     name: str = "exprstmt"
 
 
-class Variable(ASTNode):
+class Variable(IRNode):
     type: AstType = NodeType.VARIABLE
     name: str = "variable"
 
 
-class Assign(ASTNode):
+class Assign(IRNode):
     type: AstType = NodeType.ASSIGN
     name: str = "assign"
 
 
-class Block(ASTNode):
+class Block(IRNode):
     type: AstType = NodeType.BLOCK
     name: str = "block"
 
 
-class If(ASTNode):
+class If(IRNode):
     type: AstType = NodeType.IF
     name: str = "if"
 
 
-class While(ASTNode):
+class While(IRNode):
     type: AstType = NodeType.WHILE
     name: str = "while"
 
 
-class Call(ASTNode):
+class Call(IRNode):
     type: AstType = NodeType.CALL
     name: str = "call"
 
 
-class Return(ASTNode):
+class Return(IRNode):
     type: AstType = NodeType.RETURN
     name: str = "return"
 
 
-class Logical(ASTNode):
+class Logical(IRNode):
     type: AstType = NodeType.LOGICAL
     name: str = "logical"
 
 
-class Function(ASTNode):
+class Function(IRNode):
     type: AstType = NodeType.FUNCTION
     name: str = "function"
 
 
-class Expr(ASTNode):
+class Expr(IRNode):
     type: AstType = NodeType.EXPR
     name: str = "expr"
 
 
-class For(ASTNode):
+class For(IRNode):
     type: AstType = NodeType.FOR
     name: str = "for"
 
 
-class Break(ASTNode):
+class Break(IRNode):
     type: AstType = NodeType.BREAK
     name: str = "break"
 
 
-class Continue(ASTNode):
+class Continue(IRNode):
     type: AstType = NodeType.CONTINUE
     name: str = "continue"

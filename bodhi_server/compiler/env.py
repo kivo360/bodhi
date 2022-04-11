@@ -1,11 +1,13 @@
 from typing import Any, Dict, Optional, cast
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
-from dubdub import Token, dataclass
+# from bodhi_server import dataclass
+from bodhi_server.compiler import Token
+from bodhi_server import FlexModel
 
 
-class Environment(BaseModel):
+class Environment(FlexModel):
     values: Dict[str, Any] = {}
     enclosing: Optional["Environment"] = None
 
@@ -43,5 +45,3 @@ class Environment(BaseModel):
 
     def assign_at(self, distance: int, name: Token, value: Any) -> None:
         self.ancestor(distance).values[name.lexeme] = value
-
-)

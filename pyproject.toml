@@ -52,6 +52,8 @@ asyncpg = "^0.25.0"
 httpx = "0.22.0"
 prisma = "^0.6.3"
 Jinja2 = "^3.1.0"
+flytekit = "^0.31.0"
+libcst = "^0.4.1"
 
 [tool.poetry.dev-dependencies]
 pytest = "^5.2"
