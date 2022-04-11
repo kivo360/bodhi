@@ -8,10 +8,12 @@ from devtools import debug
 from loguru import logger
 
 import retworkx as rx
-from pydantic import Field, root_validator
+from pydantic import Field
+from pydantic import root_validator
 from rich import print
 
 from bodhi_server import FlexModel
+from bodhi_server import utils
 from bodhi_server.compiler import Binary
 from bodhi_server.compiler import Expr
 from bodhi_server.compiler import ExprVisitor
@@ -25,12 +27,14 @@ from bodhi_server.compiler import Token
 from bodhi_server.compiler import TokenType
 from bodhi_server.compiler import Unary
 from bodhi_server.compiler import Visitor
-from bodhi_server.compiler.utils import flexify
 
 # from bodhi_server.compiler.callables import Clock
 from bodhi_server.compiler.bodhi_ir import edges as ex
 from bodhi_server.compiler.bodhi_ir import nodes as dx
-from bodhi_server.compiler.bodhi_ir.abc import ASTNode
+from bodhi_server.compiler.bodhi_ir.abc import IREdge
+from bodhi_server.compiler.bodhi_ir.abc import IRNode
+from bodhi_server.compiler.bodhi_ir.abc import IRVisitor
+from bodhi_server.compiler.bodhi_ir.visitors.json_convert import JsonVisitor
 from bodhi_server.compiler.env import Environment
 from bodhi_server.compiler.operations import Assign
 from bodhi_server.compiler.operations import Block
@@ -39,9 +43,13 @@ from bodhi_server.compiler.operations import Continue
 from bodhi_server.compiler.operations import ExprStmt
 from bodhi_server.compiler.operations import Function
 from bodhi_server.compiler.operations import If
+from bodhi_server.compiler.operations import Module
 from bodhi_server.compiler.operations import Print
-from bodhi_server.compiler.operations import Return, Var
-from bodhi_server.compiler.operations import While, Module
+from bodhi_server.compiler.operations import Return
+from bodhi_server.compiler.operations import Var
+from bodhi_server.compiler.operations import While
+from bodhi_server.compiler.utils import flexify
+
 
 # from bodhi_server.compiler.operations import *
 
@@ -115,19 +123,21 @@ class __IRAnalyzer(Visitor, ExprVisitor, StmtVisitor):  # type: ignore
 
 class __IRAnalyzer(__IRAnalyzer):  # type: ignore
     def visit_binary(self, node: Binary):
-
-        binop_idx = self.ast.add_node(dx.Binary(name=node.token.lexeme, type=node.token.token_type))  # type: ignore
-        # right_node = node.right.decompose(self.env)
-        # left_node = node.left.decompose(self.env)
+        lexeme = node.token.lexeme
+        operation = dx.get_binary(lexeme)()
+        binop_idx = self.ast.add_node(operation)  # type: ignore
 
         self.ast.add_edge(binop_idx, self.visit(node.right), ex.Right())
         self.ast.add_edge(binop_idx, self.visit(node.right), ex.Left())
 
-        logger.info("Running binary")
+        # logger.info("Running binary")
+        # debug(operation)
         return binop_idx
 
     def visit_unary(self, node: Unary):
-        unary_idx = self.ast.add_node(dx.Unary(name=node.token.lexeme, type=node.token.token_type))  # type: ignore
+        lexeme = node.token.lexeme
+        operation = dx.get_unary(lexeme)()
+        unary_idx = self.ast.add_node(operation)  # type: ignore
 
         self.ast.add_edge(unary_idx, self.visit(node.expr), ex.Expr())
         return unary_idx
@@ -139,12 +149,15 @@ class __IRAnalyzer(__IRAnalyzer):  # type: ignore
         return unary_idx
 
     def visit_literal(self, node: Literal):
-        val_node = self.ast.add_node(dx.Value(value=node.value))
+        val = node.value
+        val_node = self.ast.add_node(dx.get_literal(type(val))(value=val))  # type: ignore
         return val_node
 
     def visit_module(self, expr: Module):
-        for stmt in expr.body:
-            self.visit(stmt)
+        module_idx = self.ast.add_node(dx.Module())  # type: ignore
+        for idx, body_stmt in enumerate(expr.body):
+            self.ast.add_edge(module_idx, self.visit(body_stmt), ex.StmtOf(index=idx))
+        return module_idx
 
     def visit_variable_expr(self, expr: Expr):
         raise NotImplementedError
@@ -159,64 +172,96 @@ class __IRAnalyzer(__IRAnalyzer):  # type: ignore
         raise NotImplementedError
 
 
-class __IRAnalyzer(__IRAnalyzer):
-    def visit_expression_stmt(self, stmt: ExprStmt):
-        stmt_node = self.ast.add_node(dx.ExprStmt())
-        self.ast.add_edge(stmt_node, self.visit(stmt.expr), ex.Expr())
-        return None
+class __IRAnalyzer(__IRAnalyzer):  # type: ignore
+    def visit_expression_stmt(self, stmt: ExprStmt):  # type: ignore
+        # debug(self.ast)
+        expr_stmt_idx = self.ast.add_node(dx.ExprStmt())
+        self.ast.add_edge(expr_stmt_idx, self.visit(stmt.expr), ex.Expr())
+        return expr_stmt_idx
+
+    def visit_expr_stmt(self, stmt: ExprStmt):
+        return self.visit_expression_stmt(stmt)
 
     def visit_block_stmt(self, stmt: Stmt):
         raise NotImplementedError
 
-    def add_conditional(self, stmt: ASTNode, condition: Expr) -> int:
+    def add_conditional(self, stmt: IRNode, condition: Expr) -> int:
         stmt_idx = self.ast.add_node(stmt)
         self.ast.add_edge(stmt_idx, self.visit(condition))
         return stmt_idx
 
-    def visit_if_stmt(self, stmt: If):
+    def visit_if_stmt(self, stmt: If):  # type: ignore
         if_idx = self.add_conditional(dx.If(), stmt.condition)
         self.ast.add_edge(if_idx, self.visit(stmt.then_branch), ex.IsTrue())
         self.ast.add_edge(if_idx, self.visit(stmt.else_branch), ex.IsFalse())
         return if_idx
 
-    def visit_while_stmt(self, stmt: While):
+    def visit_while_stmt(self, stmt: While):  # type: ignore
         while_idx = self.add_conditional(dx.While(), stmt.condition)
         self.ast.add_edge(while_idx, self.visit(stmt.body), ex.IsTrue())
         return while_idx
 
-    def visit_function_stmt(self, stmt: Function):
+    def visit_block(self, stmt: Block):
+        block_idx: int = self.ast.add_node(dx.Block())
+        for idx, body_stmt in enumerate(stmt.stmts):
+            self.ast.add_edge(block_idx, self.visit(body_stmt), ex.StmtOf(index=idx))
+        return block_idx
+
+    def visit_function_stmt(self, stmt: Function):  # type: ignore
         # We're giving a function a name
-        self.env.define(stmt.name.lexeme, stmt)  # It's sort of doing what I need it to.
-        debug(self.env)
+        func_idx = self.ast.add_node(dx.Function(identity=stmt.name.lexeme))
+        if stmt.params is not None:
+            for param in stmt.params:
+                self.ast.add_child(
+                    func_idx, dx.Param(identity=param.lexeme), ex.Param()
+                )
+        self.ast.add_edge(func_idx, self.visit(stmt.body), ex.Body())
+
+        return func_idx
 
     def visit_return_stmt(self, stmt: Stmt):
         raise NotImplementedError
 
-    # def execute_block(self, stmts: List[Stmt], environment: Environment):
-    #     previous = self.env
-    #     try:
-    #         self.env = environment
-
-    #         for stmt in stmts:
-    #             self.visit(stmt)
-    #     except Exception as e:
-    #         raise e
-    #     finally:
-    #         self.env = previous
+    def visit_return_module(self, expr: Module):
+        raise NotImplementedError
 
     def analyze(self, stmts: Union[List[Stmt], Stmt]):
         if not isinstance(stmts, list):
             stmts = [stmts]
-
+        # logger.warning(stmts)
         self.environment = Environment()
         for stmt in stmts:
             self.visit(stmt)
+
+    def to_dict(self):
+        """Convert convert the graph into a dictionary."""
+        pass
 
 
 class IRAnalyzer(__IRAnalyzer):
     """Statement managment"""
 
     pass
+
+
+def node_display(node: IRNode):
+    label_str = f"{node.name}"
+    if node.is_value:
+        label_str = f"{label_str}:{node.value}"
+
+    return {"label": label_str, "shape": "box"}
+
+
+def edge_display(node: IREdge):
+    label_str = f"{node.name}"
+    # response = {"label": f"{node.name}:{node.identity}"}
+    # name = node.name
+    color = "black"
+    if "true" in node.name or "right" in node.name:
+        color = "green"
+    if "false" in node.name or "left" in node.name:
+        color = "blue"
+    return {"color": color}
 
 
 @logger.catch
@@ -226,19 +271,19 @@ def run(stmts: Union[List[Stmt], Stmt]) -> rx.PyDAG:
 
     if not isinstance(stmts, list):
         stmts = [stmts]
-    analyzer = IRAnalyzer()
-    resolver = Resolver(interpreter=analyzer)
-    resolver.resolve_stmts(stmts)
-    analyzer.analyze(stmts)
-    # debug(resolver)
-    return analyzer.ast
+    analyzer = IRAnalyzer()  # type: ignore
+
+    analyzer.analyze(stmts)  # type: ignore
+    ast_graph = analyzer.ast
+    # utils.graphviz_show(ast_graph, node_attr_fn=node_display, edge_attr_fn=edge_display)
+    return ast_graph
 
 
 def main():
     from bodhi_server.compiler import operations as opx
 
     logger.info("Starting the interpreter")
-    # analyzer = IRAnalyzer()
+    analyzer = IRAnalyzer()
 
     fnx = Module(
         body=[
@@ -246,7 +291,7 @@ def main():
                 "hello",
                 opx.block(
                     [
-                        ExprStmt(
+                        opx.expr_stmt(
                             expr=opx.add(
                                 left=opx.float_lt(2),
                                 right=opx.float_lt(2),
@@ -259,8 +304,19 @@ def main():
         ]
     )
     # debug(fnx)
-    run([fnx])
+    graph = run([fnx])
+    debug(graph.edges())
+
+    visitor = JsonVisitor(graph)
+    result = visitor.start()
+    debug(result)
+    # decomps = rx.dag_longest_path(graph)
+    # debug(decomps)
+
+    # for node in graph.nodes():
+    #     print(node.to_dict())
     # analyzer.analyze([fnx])
+    # print(analyzer.ast.nodes())
     # nested_scopes = "var hello = 1234.456;"
     # Note: The scanner has a index bug. Will need to solve it at some point.
     # nested_scopes = " 10 * 12 + ( 1 + 1 ) "

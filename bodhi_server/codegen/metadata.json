@@ -41,7 +41,12 @@
             "Expr": "Expr",
             "For": "For",
             "Break": "Break",
-            "Continue": "Continue"
+            "Continue": "Continue",
+            "Float": "Float",
+            "Int": "Int",
+            "String": "String",
+            "Bool": "Bool",
+            "Array": "Array"
         }
     }
 }

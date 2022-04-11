@@ -120,7 +120,7 @@ class Token(Node, IToken):
         return f"Token(type={self.token_type}, lexeme={self.lexeme}, literal={self.literal})"
 
 
-class Expr(Node, IExpr):
+class Expr(Node, IExpr, ABC):
     """An expression can be anything."""
 
     pass
@@ -153,7 +153,7 @@ class Unary(Expr):
 
 class StmtVisitor(abc.ABC):
     @abc.abstractmethod
-    def visit_expression_stmt(self, stmt: Union["Expr", "Stmt", None]):
+    def visit_expression_stmt(self, stmt: "Stmt"):  # type: ignore
         raise NotImplementedError
 
     @abc.abstractmethod

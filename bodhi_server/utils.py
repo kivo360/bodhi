@@ -25,6 +25,7 @@ from pydantic import validate_arguments
 from sqlalchemy.engine.base import Engine
 from sqlalchemy.sql import ClauseElement
 from retworkx.visualization import graphviz_draw
+from contextlib import contextmanager
 
 _T = TypeVar("_T")
 
@@ -56,7 +57,7 @@ class DynamicGlobalMap(addict.Dict):
 
 
 def consistent_naming(name: str) -> str:
-    return underscore((parameterize(name)))
+    return underscore(parameterize(name))
 
 
 def consistent_classes(name: str) -> str:

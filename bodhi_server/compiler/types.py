@@ -63,6 +63,7 @@ class TokenType(str, Enum):
 
 class EdgeTypes(str, Enum):
     ELSE = ("ELSE",)
+    PARAMS = ("PARAMS",)
     IF = ("IF",)
     BODY = ("BODY",)
     BRANCH_FALSE = ("BRANCH_FALSE",)
@@ -71,6 +72,7 @@ class EdgeTypes(str, Enum):
     LEFT = ("EXPR_LEFT",)
     RIGHT = ("EXPR_RIGHT",)
     EXPR = ("EXPR",)
+    STMT_OF = ("STMT_OF",)
     VALUE = ("VALUE",)
 
 
@@ -125,6 +127,8 @@ class NodeType(str, Enum):
     EXPRSTMT = "EXPRSTMT"
     VARIABLE = "VARIABLE"
     ASSIGN = "ASSIGN"
+    PARAM = "PARAM"
+    PARAMS = "PARAMS"
     BLOCK = "BLOCK"
     IF = "IF"
     WHILE = "WHILE"
@@ -138,6 +142,7 @@ class NodeType(str, Enum):
     BREAK = "BREAK"
     CONTINUE = "CONTINUE"
     VALUE = "VALUE"
+    MODULE = "MODULE"
 
 
 class Flavor(Enum):
